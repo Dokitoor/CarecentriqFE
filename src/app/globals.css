@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Figma Brand Tokens (Light Mode Defaults) */
+  --brand-neg200: #F5FDEF;
+  --brand-0: #9BF168;
+  --brand-50: #93E967;
+  --brand-100: #8BE166;
+  --brand-200: #7CD164;
+  --brand-300: #6DC161;
+  --brand-400: #5DB15F;
+  --brand-500: #4EA15D;
+  --brand-600: #3E915B;
+  --brand-700: #2F8259;
+  --brand-800: #1F7156;
+  --brand-900: #106254;
+  --brand-1000: #005252;
+  --brand-1200: #003333;
+
+  /* Figma Real Greys (Light Mode) */
+  --grey-0: #FFFFFF;
+  --grey-50: #F3F3F3;
+  --grey-100: #E7E7E7;
+  --grey-200: #CECECE;
+  --grey-300: #B6B6B6;
+  --grey-400: #9D9D9D;
+  --grey-500: #848484;
+  --grey-600: #6C6C6C;
+  --grey-700: #545454;
+  --grey-800: #3B3B3B;
+  --grey-900: #232323;
+  --grey-950: #161616;
+  --grey-975: #161616;
+  --grey-1000: #0A0A0A;
+
+  --rail-bg: #00342f;
+  --panel-bg: #F5FDEF;
+  --card-bg: #FFFFFF;
+  --canvas-bg: #f7faf8;
+  --border-color: #e5ece7;
+}
+
+.dark {
+  /* Figma Brand Tokens (Dark Mode) */
+  --brand-neg200: #131E14;
+  --brand-0: #9BF168;
+  --brand-50: #93E967;
+  --brand-100: #8BE166;
+  --brand-200: #7CD164;
+  --brand-300: #6DC161;
+  --brand-400: #5DB15F;
+  --brand-500: #4EA15D;
+  --brand-600: #3E915B;
+  --brand-700: #2F8259;
+  --brand-800: #1F7156;
+  --brand-900: #106254;
+  --brand-1000: #005252;
+  --brand-1200: #003333;
+
+  /* Figma Real Greys (Dark Mode) */
+  --grey-0: #0A0A0A;
+  --grey-50: #161616;
+  --grey-100: #232323;
+  --grey-200: #3B3B3B;
+  --grey-300: #545454;
+  --grey-400: #6C6C6C;
+  --grey-500: #848484;
+  --grey-600: #9D9D9D;
+  --grey-700: #B6B6B6;
+  --grey-800: #CECECE;
+  --grey-900: #E7E7E7;
+  --grey-950: #F3F3F3;
+  --grey-975: #F9F9F9;
+  --grey-1000: #FFFFFF;
+
+  --rail-bg: #061c18;
+  --panel-bg: #0d2621;
+  --card-bg: #141f1c;
+  --canvas-bg: #0a110f;
+  --border-color: #21332e;
+}
+
+body {
+  font-family: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 52, 47, 0.15);
+  border-radius: 9999px;
+}
+
+/* Sileo Toast Brand System Overrides */
+:root {
+  --sileo-duration: 500ms;
+  --sileo-state-success: #9BF168; /* Brand Lime */
+  --sileo-state-loading: #CECECE;
+  --sileo-state-error: #F87171;
+  --sileo-state-warning: #FBBF24;
+  --sileo-state-info: #60A5FA;
+  --sileo-state-action: #9BF168;
+}
+
+[data-sileo-toast] {
+  font-family: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  filter: drop-shadow(0 14px 30px rgba(0, 52, 47, 0.35)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
+}
+
+[data-sileo-title] {
+  font-family: "General Sans", sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.015em;
+  color: #FFFFFF !important;
+}
+
+[data-sileo-description] {
+  font-family: "General Sans", sans-serif !important;
+  color: #F5FDEF !important;
+  font-size: 0.825rem !important;
+  line-height: 1.35 !important;
+  font-weight: 450 !important;
+}
+
+[data-sileo-button] {
+  font-family: "General Sans", sans-serif !important;
+  font-weight: 600 !important;
+  border-radius: 9999px !important;
+  background-color: #9BF168 !important;
+  color: #00342f !important;
+  padding: 0.25rem 0.75rem !important;
+  box-shadow: 0 2px 8px rgba(155, 241, 104, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+[data-sileo-button]:hover {
+  background-color: #8BE166 !important;
+  transform: translateY(-1px);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 52, 47, 0.28);
+}
+
