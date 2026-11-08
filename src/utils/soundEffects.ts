@@ -95,30 +95,18 @@ class SoundManager {
     }
   }
 
-  // Ultra-subtle, gentle tactile micro-interaction sounds
-  public tick() {
-    this.tone(784, 0, 0.06, 'sine', 0.02);
-  }
+  // Intermediate step sounds are muted so the experience remains focused and professional
+  public tick() {}
 
-  public chime() {
-    [784, 988, 1175].forEach((f, i) => this.tone(f, i * 0.07, 0.28, 'sine', 0.022));
-  }
+  public chime() {}
 
-  public step(level: number = 1) {
-    [523, 659, 784, 1047]
-      .slice(0, 2 + Math.min(2, level))
-      .forEach((f, i) => this.tone(f, i * 0.08, 0.25, 'sine', 0.025));
-  }
+  public step(_level: number = 1) {}
 
-  public snip() {
-    this.noise(0, 0.05, 0.02, 2200);
-  }
+  public snip() {}
 
-  public pop(t: number = 0) {
-    this.noise(t, 0.06, 0.02, 800);
-    this.tone(580, t, 0.07, 'sine', 0.02);
-  }
+  public pop(_t: number = 0) {}
 
+  // Grand celebration fanfare ONLY played on the final completion page
   public fanfare() {
     const n: [number, number][] = [
       [523, 0],
@@ -129,9 +117,9 @@ class SoundManager {
       [1047, 0.55],
     ];
     n.forEach(([f, t]) => {
-      this.tone(f, t, 0.35, 'sine', 0.03);
+      this.tone(f, t, 0.35, 'sine', 0.04);
     });
-    this.tone(1319, 0.7, 0.8, 'sine', 0.035);
+    this.tone(1319, 0.7, 0.8, 'sine', 0.05);
   }
 }
 

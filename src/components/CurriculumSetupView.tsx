@@ -24,8 +24,6 @@ import {
   Plus,
   Trash2,
   Play,
-  Volume2,
-  VolumeX,
   HelpCircle,
   Minimize2,
 } from 'lucide-react';
@@ -471,8 +469,9 @@ export const CurriculumSetupView: React.FC<CurriculumSetupViewProps> = ({
   const [cociMinimized, setCociMinimized] = useState(false);
   const [completionCelebration, setCompletionCelebration] = useState(false);
 
-  // Behavior tracking state & Provider Setup
-  const [behaviorMethod, setBehaviorMethod] = useState<'abc' | 'custom'>('custom');
+  // Behavior tracking state & Provider Setup (Page 1: Choice, Page 2: Setup)
+  const [behaviorMethod, setBehaviorMethod] = useState<'abc' | 'custom'>('abc');
+  const [behaviorPage, setBehaviorPage] = useState<'choice' | 'setup'>('choice');
   const [abcDuration, setAbcDuration] = useState(false);
   const [abcLocation, setAbcLocation] = useState(false);
   const [customDuration, setCustomDuration] = useState(false);
@@ -832,52 +831,13 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
             })}
           </div>
 
-          {/* Sound Toggle & Step Counter */}
-          <div className="flex items-center gap-2.5">
-            <button
-              type="button"
-              onClick={() => {
-                const next = !soundOn;
-                setSoundOn(next);
-                Sound.setEnabled(next);
-                if (next) {
-                  toast.success('Celebration sound is on', 'Sounds and chimes are enabled.');
-                } else {
-                  toast.info('Sound is muted', 'Sound effects are now silent.');
-                }
-              }}
-              className={cn(
-                "w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer border shadow-2xs",
-                soundOn
-                  ? "bg-white hover:bg-grey-50 text-emerald-700 border-emerald-300 ring-2 ring-emerald-500/15"
-                  : "bg-black/5 hover:bg-black/10 text-grey-400 border-black/10"
-              )}
-              title={soundOn ? "Celebration sound is on (tap to mute)" : "Sound is muted (tap to enable)"}
-            >
-              {soundOn ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-            </button>
-
+          {/* Step Counter */}
+          <div className="flex items-center gap-2">
             <span className="text-[11px] font-bold text-grey-700 uppercase tracking-wider shrink-0">
               Step {stepNum} of 6
             </span>
           </div>
         </div>
-
-        {/* Reference Guide Action */}
-        {helpCard && (
-          <div className="flex items-center justify-end pt-1">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveHelpCard(helpCard);
-                Sound.pop();
-              }}
-              className="text-xs font-semibold text-brand-800 hover:text-brand-950 underline cursor-pointer"
-            >
-              View guide card
-            </button>
-          </div>
-        )}
       </div>
     );
   };
@@ -1332,8 +1292,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     onClick={() => {
                       setStep('trainings');
                       setTrainingMode('choice');
-                      Sound.step(2);
-                      Confetti.burst();
                       toast.success('Objectives Saved', 'Moving to trainings & activities setup.');
                     }}
                     className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
@@ -1749,8 +1707,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     onClick={() => {
                       setStep('tasks');
                       setTaskMode('choice');
-                      Sound.step(3);
-                      Confetti.burst();
                       toast.success('Trainings Saved', 'Moving to universal tasks setup.');
                     }}
                     className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
@@ -2163,8 +2119,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     type="button"
                     onClick={() => {
                       setStep('behavior');
-                      Sound.step(4);
-                      Confetti.burst();
                       toast.success('Tasks Saved', 'Moving to behavior measurement.');
                     }}
                     className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
@@ -2237,773 +2191,814 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
 
 {step === 'behavior' && (
         <div className="flex-1 flex flex-col md:flex-row items-stretch min-h-screen">
-          {/* Left Side: Title, 2 Cards with Official Illustrations, Detailed Provider Setup & Live Tester */}
-          <div className="flex-1 p-6 sm:p-8 lg:p-10 flex flex-col justify-between overflow-y-auto">
-            <div className="space-y-6">
-              {/* Top Navigation & Header */}
-              <div className="flex items-start gap-4">
-                <button
-                  type="button"
-                  onClick={() => setStep('tasks')}
-                  className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 mt-1 shadow-2xs"
-                  title="Back to tasks"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
+          {behaviorPage === 'choice' ? (
+            /* ========================================================
+               PAGE 1: METHOD CHOICE (Matches media_1794171704733_86372634.jpg)
+               Only the 2 method choice cards are shown here.
+            ======================================================== */
+            <>
+              <div className="flex-1 p-6 sm:p-8 lg:p-10 flex flex-col justify-between overflow-y-auto">
+                <div className="space-y-6">
+                  {/* Top Navigation & Header */}
+                  <div className="flex items-start gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setStep('tasks')}
+                      className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 mt-1 shadow-2xs"
+                      title="Back to tasks"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
 
-                <div className="space-y-1">
-                  <h1 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
-                    Behavior Measurement
-                  </h1>
-                  <h2 className="font-bold text-sm sm:text-base text-grey-900">
-                    How would you like to record behaviors?
-                  </h2>
-                  <p className="text-xs sm:text-sm text-grey-500">
-                    Choose preset ABC choices or build your own measurement settings. Your choice carries into staff Daily Notes.
-                  </p>
-                </div>
-              </div>
-
-              {/* 2 Method Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 lg:gap-6 max-w-4xl pt-1">
-                {/* Card 1: Use ABC Tracking */}
-                <div
-                  onClick={() => {
-                    setBehaviorMethod('abc');
-                    Sound.pop();
-                  }}
-                  className={cn(
-                    'p-5 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between group overflow-hidden bg-white shadow-xs',
-                    behaviorMethod === 'abc'
-                      ? 'border-[#2ee05a] ring-2 ring-[#2ee05a]/25 shadow-sm'
-                      : 'border-grey-200 hover:border-grey-300'
-                  )}
-                >
-                  <div className="space-y-3.5">
-                    {/* Illustration Container */}
-                    <div className="w-full h-40 sm:h-44 rounded-2xl bg-[#FAFAFC] border border-grey-100/90 overflow-hidden flex items-center justify-center p-3 transition-transform group-hover:scale-[1.01]">
-                      <img
-                        src={behaviorAbcImg}
-                        alt="ABC Tracking Character Group"
-                        className="w-full h-full object-contain pointer-events-none select-none"
-                      />
-                    </div>
-
-                    <div>
-                      <div className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-wide border border-emerald-200 mb-1.5">
-                        Behavioral Data - ABC
-                      </div>
-                      <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
-                        Use ABC Tracking
-                      </h3>
-                      <p className="text-xs text-grey-500 leading-relaxed mt-1">
-                        Record Antecedent, Behavior, and Consequence for each incident with consistent preset choices.
+                    <div className="space-y-1">
+                      <h1 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
+                        Behavior Measurement
+                      </h1>
+                      <h2 className="font-bold text-sm sm:text-base text-grey-900">
+                        How would you like to record behaviors?
+                      </h2>
+                      <p className="text-xs sm:text-sm text-grey-500">
+                        Choose preset ABC choices or build your own measurement settings. Your choice carries into staff Daily Notes.
                       </p>
-                      <div className="mt-2 text-[11px] font-semibold text-emerald-700 bg-emerald-50/60 px-2.5 py-1 rounded-lg border border-emerald-100 inline-block">
-                        Antecedent → Behavior → Consequence
-                      </div>
                     </div>
                   </div>
 
-                  <div className="pt-4 flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
+                  {/* 2 Method Cards Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 lg:gap-6 max-w-4xl pt-1">
+                    {/* Card 1: Use ABC Tracking */}
+                    <div
+                      onClick={() => {
                         setBehaviorMethod('abc');
-                        Sound.pop();
+                        setBehaviorPage('setup');
                       }}
                       className={cn(
-                        'px-5 py-2 rounded-full font-semibold text-xs transition-colors cursor-pointer',
+                        'p-5 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between group overflow-hidden bg-white shadow-xs',
                         behaviorMethod === 'abc'
-                          ? 'bg-[#0A0A0A] text-white shadow-xs'
-                          : 'bg-grey-100 hover:bg-grey-200 text-grey-800'
+                          ? 'border-[#2ee05a] ring-2 ring-[#2ee05a]/25 shadow-sm'
+                          : 'border-grey-200 hover:border-grey-300'
                       )}
                     >
-                      {behaviorMethod === 'abc' ? 'Active Setting' : 'Select ABC Tracking'}
-                    </button>
-                    {behaviorMethod === 'abc' && (
-                      <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-                        <Check className="w-3.5 h-3.5" /> Selected
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Card 2: Build Your Measurements */}
-                <div
-                  onClick={() => {
-                    setBehaviorMethod('custom');
-                    Sound.pop();
-                  }}
-                  className={cn(
-                    'p-5 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between group overflow-hidden bg-white shadow-xs',
-                    behaviorMethod === 'custom'
-                      ? 'border-[#2ee05a] ring-2 ring-[#2ee05a]/25 shadow-sm'
-                      : 'border-grey-200 hover:border-grey-300'
-                  )}
-                >
-                  <div className="space-y-3.5">
-                    {/* Illustration Container */}
-                    <div className="w-full h-40 sm:h-44 rounded-2xl bg-[#FAFAFC] border border-grey-100/90 overflow-hidden flex items-center justify-center p-3 transition-transform group-hover:scale-[1.01]">
-                      <img
-                        src={behaviorCustomImg}
-                        alt="Custom Build Characters"
-                        className="w-full h-full object-contain pointer-events-none select-none"
-                      />
-                    </div>
-
-                    <div>
-                      <div className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-wide border border-emerald-200 mb-1.5">
-                        Choose your measurements
-                      </div>
-                      <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
-                        Build Your Measurements
-                      </h3>
-                      <p className="text-xs text-grey-500 leading-relaxed mt-1">
-                        Set severity levels. Staff record each incident with its own severity and explanation; choose whether to include duration.
-                      </p>
-                      <div className="mt-2 text-[11px] font-semibold text-emerald-700 bg-emerald-50/60 px-2.5 py-1 rounded-lg border border-emerald-100 inline-block">
-                        Severity · Count · Duration
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-4 flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setBehaviorMethod('custom');
-                        Sound.pop();
-                      }}
-                      className={cn(
-                        'px-5 py-2 rounded-full font-semibold text-xs transition-colors cursor-pointer',
-                        behaviorMethod === 'custom'
-                          ? 'bg-[#0A0A0A] text-white shadow-xs'
-                          : 'bg-grey-100 hover:bg-grey-200 text-grey-800'
-                      )}
-                    >
-                      {behaviorMethod === 'custom' ? 'Active Setting' : 'Select Custom Build'}
-                    </button>
-                    {behaviorMethod === 'custom' && (
-                      <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-                        <Check className="w-3.5 h-3.5" /> Selected
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Informational Callout */}
-              <div className="p-3.5 rounded-2xl bg-grey-50/80 border border-grey-200/80 text-xs text-grey-600 flex items-start gap-2.5 max-w-4xl">
-                <Info className="w-4 h-4 text-grey-500 shrink-0 mt-0.5" />
-                <p>
-                  Both methods use each client’s assigned ISP Objectives. Your choice decides the behavior fields within Activity & Progress. The four note sections stay the same.
-                </p>
-              </div>
-
-              {/* ========================================================
-                  DETAILED CONFIGURATION & LIVE INTERACTIVE LOGGER
-                  (Matching lines 1012-1037 of Carecentriq Guided Setup)
-              ======================================================== */}
-              {behaviorMethod === 'abc' ? (
-                <div className="space-y-6 max-w-4xl pt-2 animate-in fade-in duration-200">
-                  {/* Two Column Layout: Provider Setup on Left, Live Staff Logger on Right */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Provider Setup Panel */}
-                    <div className="p-6 rounded-3xl bg-white border border-grey-200/90 shadow-2xs space-y-5">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-sm sm:text-base text-grey-900">Provider setup</h4>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
-                            Preset Choices
-                          </span>
-                        </div>
-                        <p className="text-xs text-grey-500 mt-1 leading-relaxed">
-                          Edit the choices once. Staff then select consistent answers instead of typing each ABC description. "Consequence" does not mean punishment.
-                        </p>
-                      </div>
-
-                      {/* 3 Columns of ABC choices */}
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div className="p-3 rounded-2xl bg-grey-50/70 border border-grey-200/70 space-y-2">
-                          <b className="text-xs text-grey-900 block font-bold">A · Antecedent</b>
-                          <ul className="text-[11px] text-grey-600 space-y-1">
-                            {['Activity requested', 'Activity ending', 'Waiting', 'Item unavailable', 'Peer interaction', 'Loud noise'].map((item) => (
-                              <li key={item} className="flex items-center gap-1.5 truncate">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        <div className="p-3 rounded-2xl bg-grey-50/70 border border-grey-200/70 space-y-2">
-                          <b className="text-xs text-grey-900 block font-bold">B · Behavior</b>
-                          <ul className="text-[11px] text-grey-600 space-y-1">
-                            {['Yelled or raised voice', 'Hit, kicked or pushed', 'Threw an item', 'Refused or turned away', 'Left the area'].map((item) => (
-                              <li key={item} className="flex items-center gap-1.5 truncate">
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        <div className="p-3 rounded-2xl bg-grey-50/70 border border-grey-200/70 space-y-2">
-                          <b className="text-xs text-grey-900 block font-bold">C · Consequence</b>
-                          <ul className="text-[11px] text-grey-600 space-y-1">
-                            {['Staff offered a break', 'Activity paused', 'Staff redirected', 'Peer moved away', 'Activity continued', 'No observed change'].map((item) => (
-                              <li key={item} className="flex items-center gap-1.5 truncate">
-                                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-
-                      {/* Toggles for Incident Duration & Location */}
-                      <div className="space-y-3 pt-2 border-t border-grey-100">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <span className="font-bold text-xs text-grey-900 block">Incident duration</span>
-                            <small className="text-[11px] text-grey-500">Minutes for each recorded incident.</small>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAbcDuration(!abcDuration);
-                              Sound.tick();
-                            }}
-                            className={cn(
-                              'w-10 h-6 rounded-full flex items-center px-0.5 transition-colors cursor-pointer shrink-0',
-                              abcDuration ? 'bg-[#2ee05a] justify-end' : 'bg-grey-300 justify-start'
-                            )}
-                          >
-                            <div className="w-5 h-5 rounded-full bg-white shadow-xs" />
-                          </button>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <span className="font-bold text-xs text-grey-900 block">Location</span>
-                            <small className="text-[11px] text-grey-500">Where each incident happened.</small>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAbcLocation(!abcLocation);
-                              Sound.tick();
-                            }}
-                            className={cn(
-                              'w-10 h-6 rounded-full flex items-center px-0.5 transition-colors cursor-pointer shrink-0',
-                              abcLocation ? 'bg-[#2ee05a] justify-end' : 'bg-grey-300 justify-start'
-                            )}
-                          >
-                            <div className="w-5 h-5 rounded-full bg-white shadow-xs" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Try it as Staff: Live Interactive Incident Logger */}
-                    <div className="p-6 rounded-3xl bg-white border border-grey-200/90 shadow-2xs space-y-4">
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-bold text-sm sm:text-base text-grey-900">
-                            Try it as staff: record one incident
-                          </h4>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200">
-                            Live Test
-                          </span>
-                        </div>
-                        <p className="text-xs text-grey-500 mt-1">
-                          Turn options on or off and try the live example.
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div className="space-y-1">
-                          <label className="text-[11px] font-semibold text-grey-700">Assigned behavior</label>
-                          <select
-                            value={draftBehavior}
-                            onChange={(e) => setDraftBehavior(e.target.value)}
-                            className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                          >
-                            <option value="Aggression">Aggression</option>
-                            <option value="Activity Refusal">Activity Refusal</option>
-                            <option value="Verbal aggression">Verbal aggression</option>
-                            {objectivesList.map((obj) => (
-                              <option key={obj.id} value={obj.title}>{obj.title}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div className="space-y-1">
-                          <label className="text-[11px] font-semibold text-grey-700">Incident time</label>
-                          <select
-                            value={draftTime}
-                            onChange={(e) => setDraftTime(e.target.value)}
-                            className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                          >
-                            <option value="9:15 AM">9:15 AM</option>
-                            <option value="10:30 AM">10:30 AM</option>
-                            <option value="1:45 PM">1:45 PM</option>
-                            <option value="3:00 PM">3:00 PM</option>
-                          </select>
-                        </div>
-
-                        <div className="space-y-1">
-                          <label className="text-[11px] font-semibold text-grey-700">A · Antecedent</label>
-                          <select
-                            value={draftAntecedent}
-                            onChange={(e) => setDraftAntecedent(e.target.value)}
-                            className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                          >
-                            {['Activity requested', 'Activity ending', 'Waiting', 'Item unavailable', 'Peer interaction', 'Loud noise'].map((a) => (
-                              <option key={a} value={a}>{a}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div className="space-y-1">
-                          <label className="text-[11px] font-semibold text-grey-700">B · Behavior</label>
-                          <select
-                            value={draftBehaviorChoice}
-                            onChange={(e) => setDraftBehaviorChoice(e.target.value)}
-                            className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                          >
-                            {['Yelled or raised voice', 'Hit, kicked or pushed', 'Threw an item', 'Refused or turned away', 'Left the area'].map((b) => (
-                              <option key={b} value={b}>{b}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div className={cn('space-y-1', !abcDuration && !abcLocation ? 'sm:col-span-2' : '')}>
-                          <label className="text-[11px] font-semibold text-grey-700">C · Consequence</label>
-                          <select
-                            value={draftConsequence}
-                            onChange={(e) => setDraftConsequence(e.target.value)}
-                            className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                          >
-                            {['Staff offered a break', 'Activity paused', 'Staff redirected', 'Peer moved away', 'Activity continued', 'No observed change'].map((c) => (
-                              <option key={c} value={c}>{c}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        {abcDuration && (
-                          <div className="space-y-1">
-                            <label className="text-[11px] font-semibold text-grey-700">Incident duration · minutes</label>
-                            <input
-                              type="number"
-                              min="1"
-                              value={draftDurationMins}
-                              onChange={(e) => setDraftDurationMins(e.target.value)}
-                              className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none"
-                            />
-                          </div>
-                        )}
-
-                        {abcLocation && (
-                          <div className="space-y-1 sm:col-span-2">
-                            <label className="text-[11px] font-semibold text-grey-700">Location</label>
-                            <select
-                              value={draftLocation}
-                              onChange={(e) => setDraftLocation(e.target.value)}
-                              className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                            >
-                              {['Community park', 'Program site', 'Vehicle', 'Community venue', 'Not observed / Unknown'].map((l) => (
-                                <option key={l} value={l}>{l}</option>
-                              ))}
-                            </select>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex items-center justify-between pt-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newInc = {
-                              id: `inc-${Date.now()}`,
-                              time: draftTime,
-                              behavior: draftBehavior,
-                              a: draftAntecedent,
-                              b: draftBehaviorChoice,
-                              c: draftConsequence,
-                              dur: abcDuration ? `${draftDurationMins} mins` : undefined,
-                              loc: abcLocation ? draftLocation : undefined,
-                            };
-                            setIncidentLog((prev) => [newInc, ...prev]);
-                            Sound.step(1);
-                            setIncidentFeedback('ABC entry saved in this example.');
-                            setTimeout(() => setIncidentFeedback(null), 3000);
-                          }}
-                          className="px-4 py-2 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors cursor-pointer shadow-xs"
-                        >
-                          Save incident
-                        </button>
-                        {incidentFeedback && (
-                          <span className="text-xs font-bold text-emerald-600 animate-in fade-in">
-                            ✓ {incidentFeedback}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Logged Incidents Table */}
-                      <div className="pt-2 border-t border-grey-100">
-                        <div className="text-[11px] font-bold text-grey-500 uppercase tracking-wider mb-2">
-                          Logged Incidents ({incidentLog.length})
-                        </div>
-                        <div className="overflow-x-auto max-h-36 overflow-y-auto border border-grey-200 rounded-xl">
-                          <table className="w-full text-left text-[11px] text-grey-800">
-                            <thead className="bg-grey-50 border-b border-grey-200 text-grey-600 font-semibold">
-                              <tr>
-                                <th className="p-2">Behavior</th>
-                                <th className="p-2">A</th>
-                                <th className="p-2">B</th>
-                                <th className="p-2">C</th>
-                                {(abcDuration || abcLocation) && <th className="p-2">Details</th>}
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-grey-100">
-                              {incidentLog.map((row) => (
-                                <tr key={row.id} className="hover:bg-grey-50/50">
-                                  <td className="p-2 font-medium">
-                                    {row.behavior}
-                                    <span className="block text-[10px] text-grey-400">{row.time}</span>
-                                  </td>
-                                  <td className="p-2 text-grey-600">{row.a || '—'}</td>
-                                  <td className="p-2 text-grey-600">{row.b || '—'}</td>
-                                  <td className="p-2 text-grey-600">{row.c || '—'}</td>
-                                  {(abcDuration || abcLocation) && (
-                                    <td className="p-2 text-grey-500 text-[10px]">
-                                      {row.dur && <span className="mr-1">{row.dur}</span>}
-                                      {row.loc && <span>({row.loc})</span>}
-                                    </td>
-                                  )}
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-6 max-w-4xl pt-2 animate-in fade-in duration-200">
-                  {/* Two Column Layout for Custom Measurements */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Provider Setup Panel: Severity & Settings */}
-                    <div className="p-6 rounded-3xl bg-white border border-grey-200/90 shadow-2xs space-y-5">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-sm sm:text-base text-grey-900">Provider setup</h4>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-50 text-purple-800 border border-purple-200">
-                            Custom Severity
-                          </span>
-                        </div>
-                        <p className="text-xs text-grey-500 mt-1 leading-relaxed">
-                          Define severity criteria for incidents and configure tracking fields.
-                        </p>
-                      </div>
-
-                      {/* 3 Severity Cards */}
-                      <div className="space-y-2.5">
-                        <div className="p-3 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 flex items-start justify-between gap-3">
-                          <div>
-                            <b className="text-xs text-emerald-950 font-bold block">1 · Mild</b>
-                            <p className="text-[11px] text-emerald-800 mt-0.5">Easy to redirect.</p>
-                          </div>
-                          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md">
-                            Level 1
-                          </span>
-                        </div>
-
-                        <div className="p-3 rounded-2xl bg-amber-50/50 border border-amber-200/80 flex items-start justify-between gap-3">
-                          <div>
-                            <b className="text-xs text-amber-950 font-bold block">2 · Moderate</b>
-                            <p className="text-[11px] text-amber-800 mt-0.5">Difficult to redirect.</p>
-                          </div>
-                          <span className="text-[10px] font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-md">
-                            Level 2
-                          </span>
-                        </div>
-
-                        <div className="p-3 rounded-2xl bg-rose-50/50 border border-rose-200/80 flex items-start justify-between gap-3">
-                          <div>
-                            <b className="text-xs text-rose-950 font-bold block">3 · Severe</b>
-                            <p className="text-[11px] text-rose-800 mt-0.5">Staff assistance needed for safety.</p>
-                          </div>
-                          <span className="text-[10px] font-bold text-rose-700 bg-rose-100/80 px-2 py-0.5 rounded-md">
-                            Level 3
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Settings Rows */}
-                      <div className="space-y-3 pt-2 border-t border-grey-100">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <span className="font-bold text-xs text-grey-900 block">Multiple incidents</span>
-                            <small className="text-[11px] text-grey-500">Choose between a count or one entry per incident.</small>
-                          </div>
-                          <span className="text-[10px] font-bold text-grey-600 bg-grey-100 px-2 py-1 rounded-md">
-                            Always included
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <span className="font-bold text-xs text-grey-900 block">Incident duration</span>
-                            <small className="text-[11px] text-grey-500">Minutes for each recorded incident.</small>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setCustomDuration(!customDuration);
-                              Sound.tick();
-                            }}
-                            className={cn(
-                              'w-10 h-6 rounded-full flex items-center px-0.5 transition-colors cursor-pointer shrink-0',
-                              customDuration ? 'bg-[#2ee05a] justify-end' : 'bg-grey-300 justify-start'
-                            )}
-                          >
-                            <div className="w-5 h-5 rounded-full bg-white shadow-xs" />
-                          </button>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <span className="font-bold text-xs text-grey-900 block">Explain behavior incident</span>
-                            <small className="text-[11px] text-grey-500">Appears when an occurrence is recorded.</small>
-                          </div>
-                          <span className="text-[10px] font-bold text-grey-600 bg-grey-100 px-2 py-1 rounded-md">
-                            Always included
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Try it as Staff: Live Interactive Incident Logger for Custom */}
-                    <div className="p-6 rounded-3xl bg-white border border-grey-200/90 shadow-2xs space-y-4">
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-bold text-sm sm:text-base text-grey-900">
-                            Try it as staff: record one incident
-                          </h4>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200">
-                            Live Test
-                          </span>
-                        </div>
-                        <p className="text-xs text-grey-500 mt-1">
-                          Turn options on or off and try the live example.
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div className="space-y-1">
-                          <label className="text-[11px] font-semibold text-grey-700">Assigned behavior</label>
-                          <select
-                            value={draftBehavior}
-                            onChange={(e) => setDraftBehavior(e.target.value)}
-                            className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                          >
-                            <option value="Aggression">Aggression</option>
-                            <option value="Activity Refusal">Activity Refusal</option>
-                            <option value="Verbal aggression">Verbal aggression</option>
-                            {objectivesList.map((obj) => (
-                              <option key={obj.id} value={obj.title}>{obj.title}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div className="space-y-1">
-                          <label className="text-[11px] font-semibold text-grey-700">Occurrence status</label>
-                          <select
-                            value={draftOccurrence}
-                            onChange={(e) => setDraftOccurrence(e.target.value as 'Occurred' | 'No occurrence')}
-                            className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                          >
-                            <option value="Occurred">Occurred</option>
-                            <option value="No occurrence">No occurrence</option>
-                          </select>
-                        </div>
-
-                        <div className={cn('space-y-1', !customDuration ? 'sm:col-span-2' : '')}>
-                          <label className="text-[11px] font-semibold text-grey-700">Severity level</label>
-                          <select
-                            value={draftSeverity}
-                            onChange={(e) => setDraftSeverity(e.target.value)}
-                            className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                          >
-                            <option value="1 · Mild">1 · Mild (Easy to redirect)</option>
-                            <option value="2 · Moderate">2 · Moderate (Difficult to redirect)</option>
-                            <option value="3 · Severe">3 · Severe (Safety assistance)</option>
-                          </select>
-                        </div>
-
-                        {customDuration && (
-                          <div className="space-y-1">
-                            <label className="text-[11px] font-semibold text-grey-700">Incident duration · minutes</label>
-                            <input
-                              type="number"
-                              min="1"
-                              value={draftDurationMins}
-                              onChange={(e) => setDraftDurationMins(e.target.value)}
-                              className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none"
-                            />
-                          </div>
-                        )}
-
-                        <div className="space-y-1 sm:col-span-2">
-                          <label className="text-[11px] font-semibold text-grey-700">Explain behavior incident</label>
-                          <textarea
-                            rows={2}
-                            value={draftExplanation}
-                            onChange={(e) => setDraftExplanation(e.target.value)}
-                            placeholder="Describe the incident and response…"
-                            className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none resize-none"
+                      <div className="space-y-3.5">
+                        {/* Illustration Container */}
+                        <div className="w-full h-40 sm:h-44 rounded-2xl bg-[#FAFAFC] border border-grey-100/90 overflow-hidden flex items-center justify-center p-3 transition-transform group-hover:scale-[1.01]">
+                          <img
+                            src={behaviorAbcImg}
+                            alt="ABC Tracking Character Group"
+                            className="w-full h-full object-contain pointer-events-none select-none"
                           />
                         </div>
+
+                        <div>
+                          <div className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-wide border border-emerald-200 mb-1.5">
+                            Behavioral Data - ABC
+                          </div>
+                          <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
+                            Use ABC Tracking
+                          </h3>
+                          <p className="text-xs text-grey-500 leading-relaxed mt-1">
+                            Record Antecedent, Behavior, and Consequence for each incident with consistent preset choices.
+                          </p>
+                          <div className="mt-2 text-[11px] font-semibold text-emerald-700 bg-emerald-50/60 px-2.5 py-1 rounded-lg border border-emerald-100 inline-block">
+                            Antecedent → Behavior → Consequence
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-2">
+                      <div className="pt-5">
                         <button
                           type="button"
-                          onClick={() => {
-                            const newInc = {
-                              id: `inc-${Date.now()}`,
-                              time: draftTime,
-                              behavior: draftBehavior,
-                              occ: draftOccurrence,
-                              sev: draftOccurrence === 'Occurred' ? draftSeverity : 'None',
-                              dur: customDuration ? `${draftDurationMins} mins` : undefined,
-                              notes: draftExplanation,
-                            };
-                            setIncidentLog((prev) => [newInc, ...prev]);
-                            Sound.step(1);
-                            setIncidentFeedback('Incident saved in this example.');
-                            setTimeout(() => setIncidentFeedback(null), 3000);
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setBehaviorMethod('abc');
+                            setBehaviorPage('setup');
                           }}
-                          className="px-4 py-2 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors cursor-pointer shadow-xs"
+                          className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors cursor-pointer shadow-xs"
                         >
-                          Save incident
+                          Set up ABC Tracking
                         </button>
-                        {incidentFeedback && (
-                          <span className="text-xs font-bold text-emerald-600 animate-in fade-in">
-                            ✓ {incidentFeedback}
-                          </span>
-                        )}
+                      </div>
+                    </div>
+
+                    {/* Card 2: Build Your Measurements */}
+                    <div
+                      onClick={() => {
+                        setBehaviorMethod('custom');
+                        setBehaviorPage('setup');
+                      }}
+                      className={cn(
+                        'p-5 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between group overflow-hidden bg-white shadow-xs',
+                        behaviorMethod === 'custom'
+                          ? 'border-[#2ee05a] ring-2 ring-[#2ee05a]/25 shadow-sm'
+                          : 'border-grey-200 hover:border-grey-300'
+                      )}
+                    >
+                      <div className="space-y-3.5">
+                        {/* Illustration Container */}
+                        <div className="w-full h-40 sm:h-44 rounded-2xl bg-[#FAFAFC] border border-grey-100/90 overflow-hidden flex items-center justify-center p-3 transition-transform group-hover:scale-[1.01]">
+                          <img
+                            src={behaviorCustomImg}
+                            alt="Custom Build Characters"
+                            className="w-full h-full object-contain pointer-events-none select-none"
+                          />
+                        </div>
+
+                        <div>
+                          <div className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-wide border border-emerald-200 mb-1.5">
+                            Choose your measurements
+                          </div>
+                          <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
+                            Build Your Measurements
+                          </h3>
+                          <p className="text-xs text-grey-500 leading-relaxed mt-1">
+                            Set severity levels. Staff record each incident with its own severity and explanation; choose whether to include duration.
+                          </p>
+                          <div className="mt-2 text-[11px] font-semibold text-emerald-700 bg-emerald-50/60 px-2.5 py-1 rounded-lg border border-emerald-100 inline-block">
+                            Severity · Count · Duration
+                          </div>
+                        </div>
                       </div>
 
-                      {/* Logged Incidents Table */}
-                      <div className="pt-2 border-t border-grey-100">
-                        <div className="text-[11px] font-bold text-grey-500 uppercase tracking-wider mb-2">
-                          Logged Incidents ({incidentLog.length})
-                        </div>
-                        <div className="overflow-x-auto max-h-36 overflow-y-auto border border-grey-200 rounded-xl">
-                          <table className="w-full text-left text-[11px] text-grey-800">
-                            <thead className="bg-grey-50 border-b border-grey-200 text-grey-600 font-semibold">
-                              <tr>
-                                <th className="p-2">Behavior</th>
-                                <th className="p-2">Status</th>
-                                <th className="p-2">Severity</th>
-                                <th className="p-2">Notes</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-grey-100">
-                              {incidentLog.map((row) => (
-                                <tr key={row.id} className="hover:bg-grey-50/50">
-                                  <td className="p-2 font-medium">
-                                    {row.behavior}
-                                    <span className="block text-[10px] text-grey-400">{row.time}</span>
-                                  </td>
-                                  <td className="p-2 text-grey-600">{row.occ || 'Occurred'}</td>
-                                  <td className="p-2 text-grey-600">{row.sev || '—'}</td>
-                                  <td className="p-2 text-grey-500 text-[10px] max-w-[140px] truncate">
-                                    {row.notes || '—'}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                      <div className="pt-5">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setBehaviorMethod('custom');
+                            setBehaviorPage('setup');
+                          }}
+                          className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors cursor-pointer shadow-xs"
+                        >
+                          Build Your Measurements
+                        </button>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
 
-            {/* Bottom Actions */}
-            <div className="mt-8 pt-4 flex items-center justify-between border-t border-grey-100">
-              <button
-                type="button"
-                onClick={() => setStep('tasks')}
-                className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-700 transition-colors cursor-pointer"
-              >
-                Back
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setStep('calendar');
-                  Sound.step(5);
-                  Confetti.burst();
-                  toast.success('Behavior Measurement Configured', 'Moving to calendar setup.');
-                }}
-                className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors cursor-pointer flex items-center gap-2 shadow-xs"
-              >
-                <span>Continue to program calendar</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-
-          {/* Right Side: Informational Context Panel (Matching media_1793886090218_4fbc4601.png) */}
-          <div className="w-full md:w-[380px] lg:w-[420px] bg-[#FCECE7] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-orange-100">
-            {/* Soft decorative background wavy ribbon */}
-            <div className="absolute -top-6 -right-6 w-56 h-56 pointer-events-none opacity-25 select-none">
-              <svg viewBox="0 0 200 200" fill="none" className="w-full h-full text-[#E7A68D]">
-                <path
-                  d="M20,20 C80,80 140,20 180,80 C220,140 160,200 100,180"
-                  stroke="currentColor"
-                  strokeWidth="32"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-              </svg>
-            </div>
-
-            <div className="space-y-6 z-10">
-              {/* Page Numbering Atop Explanation Segment */}
-              {renderStepProgressPills(4)}
-
-              <div className="p-6 rounded-3xl bg-white shadow-2xs border border-white/80 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-sm text-grey-900">
-                    What is behavior measurement?
-                  </h4>
-                  <div className="w-7 h-7 rounded-lg bg-orange-100 flex items-center justify-center text-orange-700">
-                    <Folder className="w-4 h-4" />
+                  {/* Informational Callout */}
+                  <div className="p-3.5 rounded-2xl bg-grey-50/80 border border-grey-200/80 text-xs text-grey-600 flex items-start gap-2.5 max-w-4xl">
+                    <Info className="w-4 h-4 text-grey-500 shrink-0 mt-0.5" />
+                    <p>
+                      Both methods use each client’s assigned ISP Objectives. Your choice decides the behavior fields within Activity & Progress. The four note sections stay the same.
+                    </p>
                   </div>
                 </div>
-                <p className="text-xs text-grey-600 leading-relaxed">
-                  Measurement settings define how staff record observations. Choose one tracking method for this configuration. Both methods use each client's assigned ISP Objectives
-                </p>
-              </div>
-            </div>
 
-            <div className="pt-8 text-xs text-emerald-800 italic text-right z-10 font-medium">
-              Your choice carries into staff Daily Notes.
-            </div>
-          </div>
+                {/* Bottom Actions for Choice Page */}
+                <div className="mt-8 pt-4 flex items-center justify-between border-t border-grey-100">
+                  <button
+                    type="button"
+                    onClick={() => setStep('tasks')}
+                    className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-700 transition-colors cursor-pointer"
+                  >
+                    Back to tasks
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep('calendar');
+                      toast.info('Skipped Behavior Setup', 'Moved to calendar setup.');
+                    }}
+                    className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-700 transition-colors cursor-pointer"
+                  >
+                    Skip for now
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Side: Informational Context Panel */}
+              <div className="w-full md:w-[380px] lg:w-[420px] bg-[#FCECE7] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-orange-100">
+                <div className="space-y-6 z-10">
+                  {renderStepProgressPills(4)}
+
+                  <div className="p-6 rounded-3xl bg-white shadow-2xs border border-white/80 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">
+                        What is behavior measurement?
+                      </h4>
+                      <div className="w-7 h-7 rounded-lg bg-orange-100 flex items-center justify-center text-orange-700">
+                        <Folder className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <p className="text-xs text-grey-600 leading-relaxed">
+                      Measurement settings define how staff record observations. Choose one tracking method for this configuration. Both methods use each client's assigned ISP Objectives
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-8 text-xs text-emerald-800 italic text-right z-10 font-medium">
+                  Your choice carries into staff Daily Notes.
+                </div>
+              </div>
+            </>
+          ) : (
+            /* ========================================================
+               PAGE 2: DETAILED SETUP & LIVE TEST LOGGER
+               (Shown on a separate page after user picks ABC or Custom)
+            ======================================================== */
+            <>
+              <div className="flex-1 p-6 sm:p-8 lg:p-10 flex flex-col justify-between overflow-y-auto">
+                <div className="space-y-6">
+                  {/* Top Navigation & Header for Setup Page */}
+                  <div className="flex items-start gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setBehaviorPage('choice')}
+                      className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 mt-1 shadow-2xs"
+                      title="Back to choices"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+
+                    <div className="space-y-1">
+                      <div className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-wide border border-emerald-200 mb-1">
+                        {behaviorMethod === 'abc' ? 'Behavioral Data - ABC' : 'Custom measurements'}
+                      </div>
+                      <h1 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
+                        {behaviorMethod === 'abc' ? 'Set up ABC Tracking' : 'Build Your Measurements'}
+                      </h1>
+                      <p className="text-xs sm:text-sm text-grey-500">
+                        {behaviorMethod === 'abc'
+                          ? 'Edit the preset choices once. Staff then select consistent answers instead of typing each ABC description.'
+                          : 'Define severity criteria for incidents and configure tracking fields.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Setup Content: ABC vs Custom */}
+                  {behaviorMethod === 'abc' ? (
+                    <div className="space-y-6 max-w-4xl pt-1 animate-in fade-in duration-200">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Provider Setup Panel */}
+                        <div className="p-6 rounded-3xl bg-white border border-grey-200/90 shadow-2xs space-y-5">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-bold text-sm sm:text-base text-grey-900">Provider setup</h4>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                Preset Choices
+                              </span>
+                            </div>
+                            <p className="text-xs text-grey-500 mt-1 leading-relaxed">
+                              Staff select consistent answers instead of typing descriptions. "Consequence" does not mean punishment.
+                            </p>
+                          </div>
+
+                          {/* 3 Columns of ABC choices */}
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div className="p-3 rounded-2xl bg-grey-50/70 border border-grey-200/70 space-y-2">
+                              <b className="text-xs text-grey-900 block font-bold">A · Antecedent</b>
+                              <ul className="text-[11px] text-grey-600 space-y-1">
+                                {['Activity requested', 'Activity ending', 'Waiting', 'Item unavailable', 'Peer interaction', 'Loud noise'].map((item) => (
+                                  <li key={item} className="flex items-center gap-1.5 truncate">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                                    <span>{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            <div className="p-3 rounded-2xl bg-grey-50/70 border border-grey-200/70 space-y-2">
+                              <b className="text-xs text-grey-900 block font-bold">B · Behavior</b>
+                              <ul className="text-[11px] text-grey-600 space-y-1">
+                                {['Yelled or raised voice', 'Hit, kicked or pushed', 'Threw an item', 'Refused or turned away', 'Left the area'].map((item) => (
+                                  <li key={item} className="flex items-center gap-1.5 truncate">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                                    <span>{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            <div className="p-3 rounded-2xl bg-grey-50/70 border border-grey-200/70 space-y-2">
+                              <b className="text-xs text-grey-900 block font-bold">C · Consequence</b>
+                              <ul className="text-[11px] text-grey-600 space-y-1">
+                                {['Staff offered a break', 'Activity paused', 'Staff redirected', 'Peer moved away', 'Activity continued', 'No observed change'].map((item) => (
+                                  <li key={item} className="flex items-center gap-1.5 truncate">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+                                    <span>{item}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+
+                          {/* Toggles for Incident Duration & Location */}
+                          <div className="space-y-3 pt-2 border-t border-grey-100">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <span className="font-bold text-xs text-grey-900 block">Incident duration</span>
+                                <small className="text-[11px] text-grey-500">Minutes for each recorded incident.</small>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setAbcDuration(!abcDuration)}
+                                className={cn(
+                                  'w-10 h-6 rounded-full flex items-center px-0.5 transition-colors cursor-pointer shrink-0',
+                                  abcDuration ? 'bg-[#2ee05a] justify-end' : 'bg-grey-300 justify-start'
+                                )}
+                              >
+                                <div className="w-5 h-5 rounded-full bg-white shadow-xs" />
+                              </button>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <span className="font-bold text-xs text-grey-900 block">Location</span>
+                                <small className="text-[11px] text-grey-500">Where each incident happened.</small>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setAbcLocation(!abcLocation)}
+                                className={cn(
+                                  'w-10 h-6 rounded-full flex items-center px-0.5 transition-colors cursor-pointer shrink-0',
+                                  abcLocation ? 'bg-[#2ee05a] justify-end' : 'bg-grey-300 justify-start'
+                                )}
+                              >
+                                <div className="w-5 h-5 rounded-full bg-white shadow-xs" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Try it as Staff: Live Interactive Incident Logger */}
+                        <div className="p-6 rounded-3xl bg-white border border-grey-200/90 shadow-2xs space-y-4">
+                          <div>
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-bold text-sm sm:text-base text-grey-900">
+                                Try it as staff: record one incident
+                              </h4>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200">
+                                Live Test
+                              </span>
+                            </div>
+                            <p className="text-xs text-grey-500 mt-1">
+                              Turn options on or off and test the sample logging.
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <label className="text-[11px] font-semibold text-grey-700">Assigned behavior</label>
+                              <select
+                                value={draftBehavior}
+                                onChange={(e) => setDraftBehavior(e.target.value)}
+                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
+                              >
+                                <option value="Aggression">Aggression</option>
+                                <option value="Activity Refusal">Activity Refusal</option>
+                                <option value="Verbal aggression">Verbal aggression</option>
+                                {objectivesList.map((obj) => (
+                                  <option key={obj.id} value={obj.title}>{obj.title}</option>
+                                ))}
+                              </select>
+                            </div>
+
+                            <div className="space-y-1">
+                              <label className="text-[11px] font-semibold text-grey-700">Incident time</label>
+                              <select
+                                value={draftTime}
+                                onChange={(e) => setDraftTime(e.target.value)}
+                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
+                              >
+                                <option value="9:15 AM">9:15 AM</option>
+                                <option value="10:30 AM">10:30 AM</option>
+                                <option value="1:45 PM">1:45 PM</option>
+                                <option value="3:00 PM">3:00 PM</option>
+                              </select>
+                            </div>
+
+                            <div className="space-y-1">
+                              <label className="text-[11px] font-semibold text-grey-700">A · Antecedent</label>
+                              <select
+                                value={draftAntecedent}
+                                onChange={(e) => setDraftAntecedent(e.target.value)}
+                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
+                              >
+                                {['Activity requested', 'Activity ending', 'Waiting', 'Item unavailable', 'Peer interaction', 'Loud noise'].map((a) => (
+                                  <option key={a} value={a}>{a}</option>
+                                ))}
+                              </select>
+                            </div>
+
+                            <div className="space-y-1">
+                              <label className="text-[11px] font-semibold text-grey-700">B · Behavior</label>
+                              <select
+                                value={draftBehaviorChoice}
+                                onChange={(e) => setDraftBehaviorChoice(e.target.value)}
+                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
+                              >
+                                {['Yelled or raised voice', 'Hit, kicked or pushed', 'Threw an item', 'Refused or turned away', 'Left the area'].map((b) => (
+                                  <option key={b} value={b}>{b}</option>
+                                ))}
+                              </select>
+                            </div>
+
+                            <div className={cn('space-y-1', !abcDuration && !abcLocation ? 'sm:col-span-2' : '')}>
+                              <label className="text-[11px] font-semibold text-grey-700">C · Consequence</label>
+                              <select
+                                value={draftConsequence}
+                                onChange={(e) => setDraftConsequence(e.target.value)}
+                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
+                              >
+                                {['Staff offered a break', 'Activity paused', 'Staff redirected', 'Peer moved away', 'Activity continued', 'No observed change'].map((c) => (
+                                  <option key={c} value={c}>{c}</option>
+                                ))}
+                              </select>
+                            </div>
+
+                            {abcDuration && (
+                              <div className="space-y-1">
+                                <label className="text-[11px] font-semibold text-grey-700">Incident duration · minutes</label>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={draftDurationMins}
+                                  onChange={(e) => setDraftDurationMins(e.target.value)}
+                                  className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none"
+                                />
+                              </div>
+                            )}
+
+                            {abcLocation && (
+                              <div className="space-y-1 sm:col-span-2">
+                                <label className="text-[11px] font-semibold text-grey-700">Location</label>
+                                <select
+                                  value={draftLocation}
+                                  onChange={(e) => setDraftLocation(e.target.value)}
+                                  className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
+                                >
+                                  {['Community park', 'Program site', 'Vehicle', 'Community venue', 'Not observed / Unknown'].map((l) => (
+                                    <option key={l} value={l}>{l}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center justify-between pt-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newInc = {
+                                  id: `inc-${Date.now()}`,
+                                  time: draftTime,
+                                  behavior: draftBehavior,
+                                  a: draftAntecedent,
+                                  b: draftBehaviorChoice,
+                                  c: draftConsequence,
+                                  dur: abcDuration ? `${draftDurationMins} mins` : undefined,
+                                  loc: abcLocation ? draftLocation : undefined,
+                                };
+                                setIncidentLog((prev) => [newInc, ...prev]);
+                                setIncidentFeedback('ABC entry saved in this example.');
+                                setTimeout(() => setIncidentFeedback(null), 3000);
+                              }}
+                              className="px-4 py-2 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors cursor-pointer shadow-xs"
+                            >
+                              Save incident
+                            </button>
+                            {incidentFeedback && (
+                              <span className="text-xs font-bold text-emerald-600 animate-in fade-in">
+                                ✓ {incidentFeedback}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Logged Incidents Table */}
+                          <div className="pt-2 border-t border-grey-100">
+                            <div className="text-[11px] font-bold text-grey-500 uppercase tracking-wider mb-2">
+                              Logged Incidents ({incidentLog.length})
+                            </div>
+                            <div className="overflow-x-auto max-h-36 overflow-y-auto border border-grey-200 rounded-xl">
+                              <table className="w-full text-left text-[11px] text-grey-800">
+                                <thead className="bg-grey-50 border-b border-grey-200 text-grey-600 font-semibold">
+                                  <tr>
+                                    <th className="p-2">Behavior</th>
+                                    <th className="p-2">A</th>
+                                    <th className="p-2">B</th>
+                                    <th className="p-2">C</th>
+                                    {(abcDuration || abcLocation) && <th className="p-2">Details</th>}
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-grey-100">
+                                  {incidentLog.map((row) => (
+                                    <tr key={row.id} className="hover:bg-grey-50/50">
+                                      <td className="p-2 font-medium">
+                                        {row.behavior}
+                                        <span className="block text-[10px] text-grey-400">{row.time}</span>
+                                      </td>
+                                      <td className="p-2 text-grey-600">{row.a || '—'}</td>
+                                      <td className="p-2 text-grey-600">{row.b || '—'}</td>
+                                      <td className="p-2 text-grey-600">{row.c || '—'}</td>
+                                      {(abcDuration || abcLocation) && (
+                                        <td className="p-2 text-grey-500 text-[10px]">
+                                          {row.dur && <span className="mr-1">{row.dur}</span>}
+                                          {row.loc && <span>({row.loc})</span>}
+                                        </td>
+                                      )}
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-6 max-w-4xl pt-1 animate-in fade-in duration-200">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Provider Setup Panel: Severity & Settings */}
+                        <div className="p-6 rounded-3xl bg-white border border-grey-200/90 shadow-2xs space-y-5">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-bold text-sm sm:text-base text-grey-900">Provider setup</h4>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-50 text-purple-800 border border-purple-200">
+                                Custom Severity
+                              </span>
+                            </div>
+                            <p className="text-xs text-grey-500 mt-1 leading-relaxed">
+                              Define severity criteria for incidents and configure tracking fields.
+                            </p>
+                          </div>
+
+                          {/* 3 Severity Cards */}
+                          <div className="space-y-2.5">
+                            <div className="p-3 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 flex items-start justify-between gap-3">
+                              <div>
+                                <b className="text-xs text-emerald-950 font-bold block">1 · Mild</b>
+                                <p className="text-[11px] text-emerald-800 mt-0.5">Easy to redirect.</p>
+                              </div>
+                              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md">
+                                Level 1
+                              </span>
+                            </div>
+
+                            <div className="p-3 rounded-2xl bg-amber-50/50 border border-amber-200/80 flex items-start justify-between gap-3">
+                              <div>
+                                <b className="text-xs text-amber-950 font-bold block">2 · Moderate</b>
+                                <p className="text-[11px] text-amber-800 mt-0.5">Difficult to redirect.</p>
+                              </div>
+                              <span className="text-[10px] font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-md">
+                                Level 2
+                              </span>
+                            </div>
+
+                            <div className="p-3 rounded-2xl bg-rose-50/50 border border-rose-200/80 flex items-start justify-between gap-3">
+                              <div>
+                                <b className="text-xs text-rose-950 font-bold block">3 · Severe</b>
+                                <p className="text-[11px] text-rose-800 mt-0.5">Staff assistance needed for safety.</p>
+                              </div>
+                              <span className="text-[10px] font-bold text-rose-700 bg-rose-100/80 px-2 py-0.5 rounded-md">
+                                Level 3
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Settings Rows */}
+                          <div className="space-y-3 pt-2 border-t border-grey-100">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <span className="font-bold text-xs text-grey-900 block">Multiple incidents</span>
+                                <small className="text-[11px] text-grey-500">Choose between a count or one entry per incident.</small>
+                              </div>
+                              <span className="text-[10px] font-bold text-grey-600 bg-grey-100 px-2 py-1 rounded-md">
+                                Always included
+                              </span>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <span className="font-bold text-xs text-grey-900 block">Incident duration</span>
+                                <small className="text-[11px] text-grey-500">Minutes for each recorded incident.</small>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setCustomDuration(!customDuration)}
+                                className={cn(
+                                  'w-10 h-6 rounded-full flex items-center px-0.5 transition-colors cursor-pointer shrink-0',
+                                  customDuration ? 'bg-[#2ee05a] justify-end' : 'bg-grey-300 justify-start'
+                                )}
+                              >
+                                <div className="w-5 h-5 rounded-full bg-white shadow-xs" />
+                              </button>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <span className="font-bold text-xs text-grey-900 block">Explain behavior incident</span>
+                                <small className="text-[11px] text-grey-500">Appears when an occurrence is recorded.</small>
+                              </div>
+                              <span className="text-[10px] font-bold text-grey-600 bg-grey-100 px-2 py-1 rounded-md">
+                                Always included
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Try it as Staff: Live Interactive Incident Logger for Custom */}
+                        <div className="p-6 rounded-3xl bg-white border border-grey-200/90 shadow-2xs space-y-4">
+                          <div>
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-bold text-sm sm:text-base text-grey-900">
+                                Try it as staff: record one incident
+                              </h4>
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200">
+                                Live Test
+                              </span>
+                            </div>
+                            <p className="text-xs text-grey-500 mt-1">
+                              Turn options on or off and test the sample logging.
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <label className="text-[11px] font-semibold text-grey-700">Assigned behavior</label>
+                              <select
+                                value={draftBehavior}
+                                onChange={(e) => setDraftBehavior(e.target.value)}
+                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
+                              >
+                                <option value="Aggression">Aggression</option>
+                                <option value="Activity Refusal">Activity Refusal</option>
+                                <option value="Verbal aggression">Verbal aggression</option>
+                                {objectivesList.map((obj) => (
+                                  <option key={obj.id} value={obj.title}>{obj.title}</option>
+                                ))}
+                              </select>
+                            </div>
+
+                            <div className="space-y-1">
+                              <label className="text-[11px] font-semibold text-grey-700">Occurrence status</label>
+                              <select
+                                value={draftOccurrence}
+                                onChange={(e) => setDraftOccurrence(e.target.value as 'Occurred' | 'No occurrence')}
+                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
+                              >
+                                <option value="Occurred">Occurred</option>
+                                <option value="No occurrence">No occurrence</option>
+                              </select>
+                            </div>
+
+                            <div className={cn('space-y-1', !customDuration ? 'sm:col-span-2' : '')}>
+                              <label className="text-[11px] font-semibold text-grey-700">Severity level</label>
+                              <select
+                                value={draftSeverity}
+                                onChange={(e) => setDraftSeverity(e.target.value)}
+                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
+                              >
+                                <option value="1 · Mild">1 · Mild (Easy to redirect)</option>
+                                <option value="2 · Moderate">2 · Moderate (Difficult to redirect)</option>
+                                <option value="3 · Severe">3 · Severe (Safety assistance)</option>
+                              </select>
+                            </div>
+
+                            {customDuration && (
+                              <div className="space-y-1">
+                                <label className="text-[11px] font-semibold text-grey-700">Incident duration · minutes</label>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={draftDurationMins}
+                                  onChange={(e) => setDraftDurationMins(e.target.value)}
+                                  className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none"
+                                />
+                              </div>
+                            )}
+
+                            <div className="space-y-1 sm:col-span-2">
+                              <label className="text-[11px] font-semibold text-grey-700">Explain behavior incident</label>
+                              <textarea
+                                rows={2}
+                                value={draftExplanation}
+                                onChange={(e) => setDraftExplanation(e.target.value)}
+                                placeholder="Describe the incident and response…"
+                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none resize-none"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newInc = {
+                                  id: `inc-${Date.now()}`,
+                                  time: draftTime,
+                                  behavior: draftBehavior,
+                                  occ: draftOccurrence,
+                                  sev: draftOccurrence === 'Occurred' ? draftSeverity : 'None',
+                                  dur: customDuration ? `${draftDurationMins} mins` : undefined,
+                                  notes: draftExplanation,
+                                };
+                                setIncidentLog((prev) => [newInc, ...prev]);
+                                setIncidentFeedback('Incident saved in this example.');
+                                setTimeout(() => setIncidentFeedback(null), 3000);
+                              }}
+                              className="px-4 py-2 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors cursor-pointer shadow-xs"
+                            >
+                              Save incident
+                            </button>
+                            {incidentFeedback && (
+                              <span className="text-xs font-bold text-emerald-600 animate-in fade-in">
+                                ✓ {incidentFeedback}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Logged Incidents Table */}
+                          <div className="pt-2 border-t border-grey-100">
+                            <div className="text-[11px] font-bold text-grey-500 uppercase tracking-wider mb-2">
+                              Logged Incidents ({incidentLog.length})
+                            </div>
+                            <div className="overflow-x-auto max-h-36 overflow-y-auto border border-grey-200 rounded-xl">
+                              <table className="w-full text-left text-[11px] text-grey-800">
+                                <thead className="bg-grey-50 border-b border-grey-200 text-grey-600 font-semibold">
+                                  <tr>
+                                    <th className="p-2">Behavior</th>
+                                    <th className="p-2">Status</th>
+                                    <th className="p-2">Severity</th>
+                                    <th className="p-2">Notes</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-grey-100">
+                                  {incidentLog.map((row) => (
+                                    <tr key={row.id} className="hover:bg-grey-50/50">
+                                      <td className="p-2 font-medium">
+                                        {row.behavior}
+                                        <span className="block text-[10px] text-grey-400">{row.time}</span>
+                                      </td>
+                                      <td className="p-2 text-grey-600">{row.occ || 'Occurred'}</td>
+                                      <td className="p-2 text-grey-600">{row.sev || '—'}</td>
+                                      <td className="p-2 text-grey-500 text-[10px] max-w-[140px] truncate">
+                                        {row.notes || '—'}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Bottom Actions for Setup Page */}
+                <div className="mt-8 pt-4 flex items-center justify-between border-t border-grey-100">
+                  <button
+                    type="button"
+                    onClick={() => setBehaviorPage('choice')}
+                    className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-700 transition-colors cursor-pointer"
+                  >
+                    Back to choices
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep('calendar');
+                      setBehaviorPage('choice');
+                      toast.success('Behavior Measurement Saved', 'Moving to calendar setup.');
+                    }}
+                    className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors cursor-pointer flex items-center gap-2 shadow-xs"
+                  >
+                    <span>Continue to program calendar</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Side: Informational Context Panel */}
+              <div className="w-full md:w-[380px] lg:w-[420px] bg-[#FCECE7] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-orange-100">
+                <div className="space-y-6 z-10">
+                  {renderStepProgressPills(4)}
+
+                  <div className="p-6 rounded-3xl bg-white shadow-2xs border border-white/80 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">
+                        {behaviorMethod === 'abc' ? 'About ABC Tracking' : 'About Severity Levels'}
+                      </h4>
+                      <div className="w-7 h-7 rounded-lg bg-orange-100 flex items-center justify-center text-orange-700">
+                        <Folder className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <p className="text-xs text-grey-600 leading-relaxed">
+                      {behaviorMethod === 'abc'
+                        ? 'ABC tracking documents Antecedents (what triggered the behavior), Behaviors (the observable client action), and Consequences (the response or environmental shift).'
+                        : 'Custom severity levels (Mild, Moderate, Severe) categorize the intensity and safety impact of incidents observed during client activities.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-8 text-xs text-emerald-800 italic text-right z-10 font-medium">
+                  Your choice carries into staff Daily Notes.
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
 
@@ -3037,29 +3032,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
 
             {/* Step Progress Numbering Atop Calendar View */}
             <div className="shrink-0 flex items-center gap-2.5 sm:gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  const next = !soundOn;
-                  setSoundOn(next);
-                  Sound.setEnabled(next);
-                  if (next) {
-                    toast.success('Celebration sound is on', 'Sounds and chimes are enabled.');
-                  } else {
-                    toast.info('Sound is muted', 'Sound effects are now silent.');
-                  }
-                }}
-                className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer border shadow-2xs",
-                  soundOn
-                    ? "bg-white hover:bg-grey-50 text-emerald-700 border-emerald-300 ring-2 ring-emerald-500/15"
-                    : "bg-grey-100 hover:bg-grey-200 text-grey-400 border-grey-200"
-                )}
-                title={soundOn ? "Celebration sound is on" : "Sound is muted"}
-              >
-                {soundOn ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-              </button>
-
               <div className="flex items-center gap-1.5 sm:gap-2">
                 {[1, 2, 3, 4, 5, 6].map((num) => {
                   const isCurrent = 5 === num;
@@ -3642,8 +3614,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                   type="button"
                   onClick={() => {
                     setStep('daily-note');
-                    Sound.step(6);
-                    Confetti.burst();
                     toast.success('Calendar Settings Saved', 'Proceeding to daily note configuration.');
                   }}
                   className="px-8 py-3 rounded-2xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-sm active:scale-98 cursor-pointer"
@@ -3687,29 +3657,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
 
             {/* Stepper on Far Right */}
             <div className="shrink-0 flex items-center gap-2.5 sm:gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  const next = !soundOn;
-                  setSoundOn(next);
-                  Sound.setEnabled(next);
-                  if (next) {
-                    toast.success('Celebration sound is on', 'Sounds and chimes are enabled.');
-                  } else {
-                    toast.info('Sound is muted', 'Sound effects are now silent.');
-                  }
-                }}
-                className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer border shadow-2xs",
-                  soundOn
-                    ? "bg-white hover:bg-grey-50 text-emerald-700 border-emerald-300 ring-2 ring-emerald-500/15"
-                    : "bg-grey-100 hover:bg-grey-200 text-grey-400 border-grey-200"
-                )}
-                title={soundOn ? "Celebration sound is on" : "Sound is muted"}
-              >
-                {soundOn ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-              </button>
-
               <div className="flex items-center gap-1.5 sm:gap-2">
                 {[1, 2, 3, 4, 5, 6].map((num) => {
                   const isCurrent = 6 === num;
