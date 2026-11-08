@@ -23,12 +23,19 @@ import {
   Folder,
   Plus,
   Trash2,
+  Play,
+  Volume2,
+  VolumeX,
+  HelpCircle,
+  Minimize2,
 } from 'lucide-react';
 import { Organization } from '../types';
 import { toast } from '../lib/toast';
 import { cn } from '../lib/utils';
 import { GreenBagMascot, PinkStarMascot } from './CurriculumMascots';
 import { VERIFIED_CARE_AVATARS, handleImageError } from '../lib/images';
+import { Sound } from '../utils/soundEffects';
+import { Confetti } from '../utils/confettiFx';
 
 // Exact artwork uploaded by user for Got a lot to add & Prefer to build it yourself (Next.js public paths)
 const objectiveFolderImg = '/objective-folder.png';
@@ -44,6 +51,146 @@ const cardMeasurementImg = '/illustrations/card-measurement.png';
 // Exact Behavior illustrations from C:\Users\LENOVO T480\Downloads\illustrations\Behaviour
 const behaviorAbcImg = '/illustrations/ABc tracking.png';
 const behaviorCustomImg = '/illustrations/custom build.png';
+
+// Video lesson metadata from Carecentriq Guided Setup
+export interface StepVideoInfo {
+  key: string;
+  src: string;
+  title: string;
+  duration: string;
+  desc: string;
+}
+
+export const STEP_VIDEOS: Record<string, StepVideoInfo> = {
+  overview: {
+    key: 'welcome',
+    src: '/videos/welcome.mp4',
+    title: 'Welcome to Carecentriq Guided Setup',
+    duration: '0:45',
+    desc: 'Coci introduces your program curriculum setup and walks you through what lies ahead.',
+  },
+  objectives: {
+    key: 'objectives',
+    src: '/videos/objectives.mp4',
+    title: 'Setting Up Program Objectives',
+    duration: '0:17',
+    desc: 'Learn how to define clear participant outcomes, upload CSV templates, or build manually.',
+  },
+  trainings: {
+    key: 'trainings',
+    src: '/videos/trainings.mp4',
+    title: 'Trainings & Activities',
+    duration: '0:19',
+    desc: 'Organize participant development into skill areas and practical scheduled activities.',
+  },
+  tasks: {
+    key: 'tasks',
+    src: '/videos/tasks.mp4',
+    title: 'Universal Tasks',
+    duration: '0:25',
+    desc: 'Understand shared evaluation criteria and prompt levels applied across shift documentation.',
+  },
+  behavior: {
+    key: 'measure',
+    src: '/videos/measure.mp4',
+    title: 'Behavior Measurement',
+    duration: '0:20',
+    desc: 'Choose between standard ABC tracking and custom frequency, severity, or duration measurement.',
+  },
+  calendar: {
+    key: 'calendar',
+    src: '/videos/calendar.mp4',
+    title: 'Program Calendar',
+    duration: '0:21',
+    desc: 'Configure what fields appear on staff shift calendars and review live month schedules.',
+  },
+  'daily-note': {
+    key: 'notes',
+    src: '/videos/notes.mp4',
+    title: 'Daily Progress Notes',
+    duration: '0:24',
+    desc: 'Review the 4 note sections and preview how staff will fill attendance and documentation.',
+  },
+  celebration: {
+    key: 'celebration',
+    src: '/videos/celebration.mp4',
+    title: 'Service Line Ready Celebration',
+    duration: '0:35',
+    desc: 'Congratulations! Your service line is configured and ready for live agency care.',
+  },
+};
+
+// Help reference cards from Carecentriq Guided Setup
+export interface StepHelpCardInfo {
+  src: string;
+  title: string;
+  desc: string;
+}
+
+export const STEP_HELP_CARDS: Record<string, StepHelpCardInfo> = {
+  objectives: {
+    src: '/guided/help_objectives.webp',
+    title: 'Program Objectives Reference Card',
+    desc: 'Objectives define measurable goals tied to participant Individual Support Plans (ISP).',
+  },
+  trainings: {
+    src: '/guided/help_trainings.webp',
+    title: 'Training Components Reference Card',
+    desc: 'Connect scheduled activities to core growth domains like Life Skills and Independence.',
+  },
+  tasks: {
+    src: '/guided/help_trainings.webp',
+    title: 'Universal Tasks Reference Card',
+    desc: 'Standardized prompt levels and criteria evaluated across activities.',
+  },
+  behavior: {
+    src: '/guided/help_measure.webp',
+    title: 'Behavior Measurement Reference Card',
+    desc: 'Guides staff on documenting antecedents, behaviors, consequences, and severity.',
+  },
+  calendar: {
+    src: '/guided/help_calendar.webp',
+    title: 'Program Calendar Reference Card',
+    desc: 'How shifts, activities, and client schedules integrate into the care workflow.',
+  },
+  'daily-note': {
+    src: '/guided/help_notes.webp',
+    title: 'Daily Progress Notes Reference Card',
+    desc: 'The official structure for client documentation, attendance, and compliance logging.',
+  },
+};
+
+// Coci mascot coach tips for each screen (friendly coach, no name request)
+export const COCI_TIPS: Record<string, { mood: string; message: string }> = {
+  overview: {
+    mood: '/guided/coci.webp',
+    message: 'Welcome! I’m Coci, and I’ll be right here with you the whole way. Ready to build your service line curriculum?',
+  },
+  objectives: {
+    mood: '/guided/coci_happy.webp',
+    message: 'Objectives define what success looks like for each client. You can upload a template or build them out one by one.',
+  },
+  trainings: {
+    mood: '/guided/coci.webp',
+    message: 'Think of training components as the skills clients are developing, and activities as the practical experiences.',
+  },
+  tasks: {
+    mood: '/guided/coci_happy.webp',
+    message: 'Universal tasks are concrete observable steps evaluated during shifts with consistent prompt levels.',
+  },
+  behavior: {
+    mood: '/guided/coci.webp',
+    message: 'Choose preset ABC tracking or build your own custom measurements. Your choice carries directly into Daily Notes!',
+  },
+  calendar: {
+    mood: '/guided/coci_happy.webp',
+    message: 'Configure your calendar fields and preview the interactive 30-day schedule for November.',
+  },
+  'daily-note': {
+    mood: '/guided/coci_jump.webp',
+    message: 'This is the final setup step! Test out the live iPhone preview beside you—try clicking attendance and options.',
+  },
+};
 
 export type CurriculumStep =
   | 'overview'
@@ -317,6 +464,13 @@ export const CurriculumSetupView: React.FC<CurriculumSetupViewProps> = ({
   const [downloadModal, setDownloadModal] = useState<'none' | 'downloading' | 'downloaded'>('none');
   const [downloadProgress, setDownloadProgress] = useState(0);
 
+  // Sound, Video Modal, Help Card, and Coci Coach State
+  const [soundOn, setSoundOn] = useState(() => Sound.isEnabled());
+  const [activeVideo, setActiveVideo] = useState<StepVideoInfo | null>(null);
+  const [activeHelpCard, setActiveHelpCard] = useState<StepHelpCardInfo | null>(null);
+  const [cociMinimized, setCociMinimized] = useState(false);
+  const [completionCelebration, setCompletionCelebration] = useState(false);
+
   // Behavior tracking state
   const [behaviorMethod, setBehaviorMethod] = useState<'abc' | 'custom'>('custom');
   const [selectedSeverity, setSelectedSeverity] = useState<string>('Significant');
@@ -396,6 +550,7 @@ export const CurriculumSetupView: React.FC<CurriculumSetupViewProps> = ({
     ]);
     setManualObjectiveTitle('');
     setManualObjectiveDesc('');
+    Sound.pop();
     toast.success('Objective Added', `Added "${manualObjectiveTitle.trim()}".`);
   };
 
@@ -404,6 +559,7 @@ export const CurriculumSetupView: React.FC<CurriculumSetupViewProps> = ({
       setManualActivities((prev) => [...prev, newActivityInput.trim()]);
       setNewActivityInput('');
       setIsAddingActivity(false);
+      Sound.pop();
       toast.info('Activity Added', `Added "${newActivityInput.trim()}".`);
     }
   };
@@ -423,6 +579,7 @@ export const CurriculumSetupView: React.FC<CurriculumSetupViewProps> = ({
     ]);
     setManualTrainingTitle('');
     setManualActivities([]);
+    Sound.pop();
     toast.success('Training Added', `Added "${manualTrainingTitle.trim()}".`);
   };
 
@@ -443,6 +600,7 @@ export const CurriculumSetupView: React.FC<CurriculumSetupViewProps> = ({
     ]);
     setManualTaskTitle('');
     setManualTaskDesc('');
+    Sound.pop();
     toast.success('Task Added', `Added "${manualTaskTitle.trim()}".`);
   };
 
@@ -580,47 +738,117 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
   const currentStepNumber = getStepNumber();
 
   // Step indicator component placed atop the right explanation segment
-  const renderStepProgressPills = (stepNum: number) => (
-    <div className="flex items-center justify-between pb-5 mb-6 border-b border-black/[0.08] w-full">
-      <div className="flex items-center gap-1.5 sm:gap-2">
-        {[1, 2, 3, 4, 5, 6].map((num) => {
-          const isCurrent = stepNum === num;
-          const isPast = stepNum > num;
-          return (
+  const renderStepProgressPills = (stepNum: number) => {
+    const videoInfo = STEP_VIDEOS[step];
+    const helpCard = STEP_HELP_CARDS[step];
+
+    return (
+      <div className="pb-5 mb-6 border-b border-black/[0.08] w-full space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          {/* Stepper Progress Pills 1-6 */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {[1, 2, 3, 4, 5, 6].map((num) => {
+              const isCurrent = stepNum === num;
+              const isPast = stepNum > num;
+              return (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => {
+                    const stepMap: Record<number, CurriculumStep> = {
+                      1: 'objectives',
+                      2: 'trainings',
+                      3: 'tasks',
+                      4: 'behavior',
+                      5: 'calendar',
+                      6: 'daily-note',
+                    };
+                    if (stepMap[num]) {
+                      setStep(stepMap[num]);
+                      Sound.tick();
+                    }
+                  }}
+                  className={cn(
+                    'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer',
+                    isCurrent
+                      ? 'bg-[#0A0A0A] text-white shadow-xs ring-2 ring-black/15 scale-105'
+                      : isPast
+                      ? 'bg-black/15 text-grey-800 hover:bg-black/25'
+                      : 'bg-black/5 text-grey-400 hover:bg-black/10'
+                  )}
+                  title={`Go to Step ${num}`}
+                >
+                  {num}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Sound Toggle & Step Counter */}
+          <div className="flex items-center gap-2.5">
             <button
-              key={num}
               type="button"
               onClick={() => {
-                const stepMap: Record<number, CurriculumStep> = {
-                  1: 'objectives',
-                  2: 'trainings',
-                  3: 'tasks',
-                  4: 'behavior',
-                  5: 'calendar',
-                  6: 'daily-note',
-                };
-                if (stepMap[num]) setStep(stepMap[num]);
+                const next = !soundOn;
+                setSoundOn(next);
+                Sound.setEnabled(next);
+                if (next) {
+                  toast.success('Celebration sound is on', 'Sounds and chimes are enabled.');
+                } else {
+                  toast.info('Sound is muted', 'Sound effects are now silent.');
+                }
               }}
               className={cn(
-                'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer',
-                isCurrent
-                  ? 'bg-[#0A0A0A] text-white shadow-xs ring-2 ring-black/15 scale-105'
-                  : isPast
-                  ? 'bg-black/15 text-grey-800 hover:bg-black/25'
-                  : 'bg-black/5 text-grey-400 hover:bg-black/10'
+                "w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer border shadow-2xs",
+                soundOn
+                  ? "bg-white hover:bg-grey-50 text-emerald-700 border-emerald-300 ring-2 ring-emerald-500/15"
+                  : "bg-black/5 hover:bg-black/10 text-grey-400 border-black/10"
               )}
-              title={`Go to Step ${num}`}
+              title={soundOn ? "Celebration sound is on (tap to mute)" : "Sound is muted (tap to enable)"}
             >
-              {num}
+              {soundOn ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
             </button>
-          );
-        })}
+
+            <span className="text-[11px] font-bold text-grey-700 uppercase tracking-wider shrink-0">
+              Step {stepNum} of 6
+            </span>
+          </div>
+        </div>
+
+        {/* Video Lesson & Reference Guide Actions */}
+        <div className="flex items-center justify-between pt-1">
+          {videoInfo ? (
+            <button
+              type="button"
+              onClick={() => {
+                setActiveVideo(videoInfo);
+                Sound.pop();
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white hover:bg-grey-50 text-grey-900 border border-grey-200/90 shadow-2xs transition-all hover:scale-[1.02] cursor-pointer"
+            >
+              <div className="w-4 h-4 rounded-full bg-[#0A0A0A] text-white flex items-center justify-center">
+                <Play className="w-2.5 h-2.5 fill-current ml-0.5" />
+              </div>
+              <span>Watch lesson ({videoInfo.duration})</span>
+            </button>
+          ) : <div />}
+
+          {helpCard && (
+            <button
+              type="button"
+              onClick={() => {
+                setActiveHelpCard(helpCard);
+                Sound.pop();
+              }}
+              className="text-xs font-semibold text-brand-800 hover:text-brand-950 underline cursor-pointer"
+            >
+              View guide card
+            </button>
+          )}
+        </div>
       </div>
-      <div className="text-[11px] font-bold text-grey-700 uppercase tracking-wider shrink-0">
-        Step {stepNum} of 6
-      </div>
-    </div>
-  );
+    );
+  };
 
   // 5 Curriculum Cards on the Slide with EXACT illustrations from C:\Users\LENOVO T480\Downloads\illustrations
   const CURRICULUM_CARDS = [
@@ -722,6 +950,23 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                 <p>
                   Each section represents what participants will learn, practice, and be supported with by staff. Together, they form a structured path for building skills and tracking progress over time.
                 </p>
+
+                {/* Lesson Video Action */}
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveVideo(STEP_VIDEOS.overview);
+                      Sound.pop();
+                    }}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold bg-white/90 hover:bg-white text-grey-900 border border-grey-200/90 shadow-2xs transition-all hover:scale-[1.02] cursor-pointer"
+                  >
+                    <div className="w-4 h-4 rounded-full bg-[#0A0A0A] text-white flex items-center justify-center">
+                      <Play className="w-2.5 h-2.5 fill-current ml-0.5" />
+                    </div>
+                    <span>Watch intro lesson ({STEP_VIDEOS.overview.duration})</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -729,7 +974,10 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
             <div className="space-y-3 pt-10 mt-auto">
               <button
                 type="button"
-                onClick={() => setStep('objectives')}
+                onClick={() => {
+                  setStep('objectives');
+                  Sound.step(1);
+                }}
                 className="w-full py-4 px-6 rounded-2xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-sm transition-all shadow-sm active:scale-98 cursor-pointer text-center"
               >
                 Proceed to set up
@@ -1069,6 +1317,8 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     onClick={() => {
                       setStep('trainings');
                       setTrainingMode('choice');
+                      Sound.step(2);
+                      Confetti.burst();
                       toast.success('Objectives Saved', 'Moving to trainings & activities setup.');
                     }}
                     className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
@@ -1484,6 +1734,8 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     onClick={() => {
                       setStep('tasks');
                       setTaskMode('choice');
+                      Sound.step(3);
+                      Confetti.burst();
                       toast.success('Trainings Saved', 'Moving to universal tasks setup.');
                     }}
                     className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
@@ -1896,6 +2148,8 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     type="button"
                     onClick={() => {
                       setStep('behavior');
+                      Sound.step(4);
+                      Confetti.burst();
                       toast.success('Tasks Saved', 'Moving to behavior measurement.');
                     }}
                     className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
@@ -2036,6 +2290,8 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                         e.stopPropagation();
                         setBehaviorMethod('abc');
                         setStep('calendar');
+                        Sound.step(5);
+                        Confetti.burst();
                         toast.success('ABC Tracking Configured', 'Moving to calendar setup.');
                       }}
                       className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors cursor-pointer"
@@ -2082,6 +2338,8 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                         e.stopPropagation();
                         setBehaviorMethod('custom');
                         setStep('calendar');
+                        Sound.step(5);
+                        Confetti.burst();
                         toast.success('Custom Measurements Configured', 'Moving to calendar setup.');
                       }}
                       className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors cursor-pointer"
@@ -2186,42 +2444,84 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
             </div>
 
             {/* Step Progress Numbering Atop Calendar View */}
-            <div className="shrink-0 flex items-center gap-1.5 sm:gap-2">
-              {[1, 2, 3, 4, 5, 6].map((num) => {
-                const isCurrent = 5 === num;
-                const isPast = 5 > num;
-                return (
-                  <button
-                    key={num}
-                    type="button"
-                    onClick={() => {
-                      const stepMap: Record<number, CurriculumStep> = {
-                        1: 'objectives',
-                        2: 'trainings',
-                        3: 'tasks',
-                        4: 'behavior',
-                        5: 'calendar',
-                        6: 'daily-note',
-                      };
-                      if (stepMap[num]) setStep(stepMap[num]);
-                    }}
-                    className={cn(
-                      'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer',
-                      isCurrent
-                        ? 'bg-[#0A0A0A] text-white shadow-xs ring-2 ring-black/15 scale-105'
-                        : isPast
-                        ? 'bg-grey-200 text-grey-800 hover:bg-grey-300'
-                        : 'bg-grey-100 text-grey-400 hover:bg-grey-200'
-                    )}
-                    title={`Go to Step ${num}`}
-                  >
-                    {num}
-                  </button>
-                );
-              })}
-              <span className="text-[11px] font-bold text-grey-600 uppercase tracking-wider ml-2">
-                Step 5 of 6
-              </span>
+            <div className="shrink-0 flex items-center gap-2.5 sm:gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveVideo(STEP_VIDEOS.calendar);
+                  Sound.pop();
+                }}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white hover:bg-grey-50 text-grey-900 border border-grey-200/90 shadow-2xs transition-all hover:scale-[1.02] cursor-pointer"
+              >
+                <div className="w-4 h-4 rounded-full bg-[#0A0A0A] text-white flex items-center justify-center">
+                  <Play className="w-2.5 h-2.5 fill-current ml-0.5" />
+                </div>
+                <span>Watch lesson ({STEP_VIDEOS.calendar.duration})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const next = !soundOn;
+                  setSoundOn(next);
+                  Sound.setEnabled(next);
+                  if (next) {
+                    toast.success('Celebration sound is on', 'Sounds and chimes are enabled.');
+                  } else {
+                    toast.info('Sound is muted', 'Sound effects are now silent.');
+                  }
+                }}
+                className={cn(
+                  "w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer border shadow-2xs",
+                  soundOn
+                    ? "bg-white hover:bg-grey-50 text-emerald-700 border-emerald-300 ring-2 ring-emerald-500/15"
+                    : "bg-grey-100 hover:bg-grey-200 text-grey-400 border-grey-200"
+                )}
+                title={soundOn ? "Celebration sound is on" : "Sound is muted"}
+              >
+                {soundOn ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+              </button>
+
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                {[1, 2, 3, 4, 5, 6].map((num) => {
+                  const isCurrent = 5 === num;
+                  const isPast = 5 > num;
+                  return (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => {
+                        const stepMap: Record<number, CurriculumStep> = {
+                          1: 'objectives',
+                          2: 'trainings',
+                          3: 'tasks',
+                          4: 'behavior',
+                          5: 'calendar',
+                          6: 'daily-note',
+                        };
+                        if (stepMap[num]) {
+                          setStep(stepMap[num]);
+                          Sound.tick();
+                        }
+                      }}
+                      className={cn(
+                        'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer',
+                        isCurrent
+                          ? 'bg-[#0A0A0A] text-white shadow-xs ring-2 ring-black/15 scale-105'
+                          : isPast
+                          ? 'bg-grey-200 text-grey-800 hover:bg-grey-300'
+                          : 'bg-grey-100 text-grey-400 hover:bg-grey-200'
+                      )}
+                      title={`Go to Step ${num}`}
+                    >
+                      {num}
+                    </button>
+                  );
+                })}
+                <span className="text-[11px] font-bold text-grey-600 uppercase tracking-wider ml-1">
+                  Step 5 of 6
+                </span>
+              </div>
             </div>
           </div>
 
@@ -2764,6 +3064,8 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                   type="button"
                   onClick={() => {
                     setStep('daily-note');
+                    Sound.step(6);
+                    Confetti.burst();
                     toast.success('Calendar Settings Saved', 'Proceeding to daily note configuration.');
                   }}
                   className="px-8 py-3 rounded-2xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-sm active:scale-98 cursor-pointer"
@@ -2806,42 +3108,84 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
             </div>
 
             {/* Stepper on Far Right */}
-            <div className="shrink-0 flex items-center gap-1.5 sm:gap-2">
-              {[1, 2, 3, 4, 5, 6].map((num) => {
-                const isCurrent = 6 === num;
-                const isPast = 6 > num;
-                return (
-                  <button
-                    key={num}
-                    type="button"
-                    onClick={() => {
-                      const stepMap: Record<number, CurriculumStep> = {
-                        1: 'objectives',
-                        2: 'trainings',
-                        3: 'tasks',
-                        4: 'behavior',
-                        5: 'calendar',
-                        6: 'daily-note',
-                      };
-                      if (stepMap[num]) setStep(stepMap[num]);
-                    }}
-                    className={cn(
-                      'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer',
-                      isCurrent
-                        ? 'bg-[#0A0A0A] text-white shadow-xs ring-2 ring-black/15 scale-105'
-                        : isPast
-                        ? 'bg-grey-200 text-grey-800 hover:bg-grey-300'
-                        : 'bg-grey-100 text-grey-400 hover:bg-grey-200'
-                    )}
-                    title={`Go to Step ${num}`}
-                  >
-                    {num}
-                  </button>
-                );
-              })}
-              <span className="text-[11px] font-bold text-grey-600 uppercase tracking-wider ml-2">
-                Step 6 of 6
-              </span>
+            <div className="shrink-0 flex items-center gap-2.5 sm:gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveVideo(STEP_VIDEOS['daily-note']);
+                  Sound.pop();
+                }}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white hover:bg-grey-50 text-grey-900 border border-grey-200/90 shadow-2xs transition-all hover:scale-[1.02] cursor-pointer"
+              >
+                <div className="w-4 h-4 rounded-full bg-[#0A0A0A] text-white flex items-center justify-center">
+                  <Play className="w-2.5 h-2.5 fill-current ml-0.5" />
+                </div>
+                <span>Watch lesson ({STEP_VIDEOS['daily-note'].duration})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const next = !soundOn;
+                  setSoundOn(next);
+                  Sound.setEnabled(next);
+                  if (next) {
+                    toast.success('Celebration sound is on', 'Sounds and chimes are enabled.');
+                  } else {
+                    toast.info('Sound is muted', 'Sound effects are now silent.');
+                  }
+                }}
+                className={cn(
+                  "w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer border shadow-2xs",
+                  soundOn
+                    ? "bg-white hover:bg-grey-50 text-emerald-700 border-emerald-300 ring-2 ring-emerald-500/15"
+                    : "bg-grey-100 hover:bg-grey-200 text-grey-400 border-grey-200"
+                )}
+                title={soundOn ? "Celebration sound is on" : "Sound is muted"}
+              >
+                {soundOn ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+              </button>
+
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                {[1, 2, 3, 4, 5, 6].map((num) => {
+                  const isCurrent = 6 === num;
+                  const isPast = 6 > num;
+                  return (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => {
+                        const stepMap: Record<number, CurriculumStep> = {
+                          1: 'objectives',
+                          2: 'trainings',
+                          3: 'tasks',
+                          4: 'behavior',
+                          5: 'calendar',
+                          6: 'daily-note',
+                        };
+                        if (stepMap[num]) {
+                          setStep(stepMap[num]);
+                          Sound.tick();
+                        }
+                      }}
+                      className={cn(
+                        'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer',
+                        isCurrent
+                          ? 'bg-[#0A0A0A] text-white shadow-xs ring-2 ring-black/15 scale-105'
+                          : isPast
+                          ? 'bg-grey-200 text-grey-800 hover:bg-grey-300'
+                          : 'bg-grey-100 text-grey-400 hover:bg-grey-200'
+                      )}
+                      title={`Go to Step ${num}`}
+                    >
+                      {num}
+                    </button>
+                  );
+                })}
+                <span className="text-[11px] font-bold text-grey-600 uppercase tracking-wider ml-1">
+                  Step 6 of 6
+                </span>
+              </div>
             </div>
           </div>
 
@@ -3125,8 +3469,12 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                   onClick={() => {
                     if (activeNoteSection < 4) {
                       setActiveNoteSection((s) => (s + 1) as 1 | 2 | 3 | 4);
+                      Sound.tick();
                       toast.info(`Moved to Section ${activeNoteSection + 1}`);
                     } else {
+                      Sound.fanfare();
+                      Confetti.rain(220, 3.5);
+                      setCompletionCelebration(true);
                       onObjectivesConfigured();
                       toast.success('Curriculum Setup Completed!', `${program.name} is now fully configured and ready.`);
                     }
@@ -3515,6 +3863,251 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
           </div>
         </div>
       )}
+
+      {/* ====================================================================
+          VIDEO LESSON PLAYER MODAL (Exact match to Carecentriq Guided Setup videos)
+      ==================================================================== */}
+      {activeVideo && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => setActiveVideo(null)}
+        >
+          <div
+            className="w-full max-w-3xl bg-[#0E1512] text-white rounded-3xl overflow-hidden shadow-2xl border border-white/10 space-y-0 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                  <Play className="w-4 h-4 fill-current ml-0.5" />
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base font-bold text-white tracking-tight">
+                    {activeVideo.title}
+                  </h3>
+                  <p className="text-xs text-grey-400">
+                    Carecentriq Guided Setup Lesson · {activeVideo.duration}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setActiveVideo(null)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+                title="Close video"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Video Player */}
+            <div className="relative bg-black aspect-video flex items-center justify-center">
+              <video
+                src={activeVideo.src}
+                controls
+                autoPlay
+                playsInline
+                preload="metadata"
+                className="w-full h-full object-contain"
+              />
+            </div>
+
+            {/* Modal Footer with Coci context */}
+            <div className="p-4 sm:p-5 bg-white/[0.04] flex items-center gap-3.5 border-t border-white/10">
+              <img
+                src="/guided/coci_head.webp"
+                alt="Coci"
+                className="w-9 h-9 rounded-full object-contain bg-emerald-950/60 p-1 border border-emerald-500/30 shrink-0"
+              />
+              <p className="text-xs text-grey-300 leading-relaxed">
+                {activeVideo.desc}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          REFERENCE GUIDE CARD MODAL (From Carecentriq Guided Setup Help Cards)
+      ==================================================================== */}
+      {activeHelpCard && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => setActiveHelpCard(null)}
+        >
+          <div
+            className="w-full max-w-md bg-white rounded-3xl overflow-hidden shadow-2xl border border-grey-200 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b border-grey-100">
+              <div className="flex items-center gap-2">
+                <img src="/guided/coci_head.webp" alt="Coci" className="w-6 h-6 rounded-full" />
+                <h3 className="font-bold text-sm text-grey-900">{activeHelpCard.title}</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveHelpCard(null)}
+                className="w-7 h-7 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-700 flex items-center justify-center transition-colors cursor-pointer"
+                title="Close guide"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="p-4 bg-grey-50">
+              <img
+                src={activeHelpCard.src}
+                alt={activeHelpCard.title}
+                className="w-full rounded-2xl border border-grey-200/80 shadow-xs"
+              />
+            </div>
+            <div className="px-5 py-3.5 border-t border-grey-100 bg-white text-xs text-grey-600">
+              {activeHelpCard.desc}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          FINALE CELEBRATION MODAL (Matching Carecentriq Guided Setup Celebration)
+      ==================================================================== */}
+      {completionCelebration && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in duration-200 select-none"
+        >
+          <div className="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-8 text-center shadow-2xl border border-grey-100 flex flex-col items-center space-y-4 animate-in zoom-in-95 duration-200">
+            {/* Celebrating Mascot Jumping */}
+            <div className="relative">
+              <img
+                src="/guided/coci_jump.webp"
+                alt="Coci Celebrating"
+                className="w-28 h-28 object-contain drop-shadow-md animate-bounce"
+              />
+              <span className="absolute -top-2 -left-2 text-2xl">🎉</span>
+              <span className="absolute -top-3 -right-2 text-2xl">✨</span>
+            </div>
+
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                Setup Complete · Ribbon Cutting
+              </span>
+              <h2 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
+                {program.name} is Ready!
+              </h2>
+              <p className="text-xs sm:text-sm text-grey-600 leading-relaxed max-w-md">
+                You’ve successfully configured your entire program curriculum: objectives, trainings, universal tasks, behavior measurement, calendar, and daily notes.
+              </p>
+            </div>
+
+            {/* Video preview / action */}
+            <div className="w-full pt-2 space-y-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveVideo(STEP_VIDEOS.celebration);
+                  Sound.fanfare();
+                }}
+                className="w-full py-3 px-5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+              >
+                <Play className="w-4 h-4 fill-current text-emerald-700" />
+                <span>Watch celebration video (0:35)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setCompletionCelebration(false);
+                  onReturnToDashboard();
+                }}
+                className="w-full py-3.5 px-6 rounded-2xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs sm:text-sm transition-all shadow-sm active:scale-98 cursor-pointer"
+              >
+                Return to dashboard
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setCompletionCelebration(false)}
+                className="text-xs font-semibold text-grey-500 hover:text-grey-900 underline transition-colors cursor-pointer"
+              >
+                Review setup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          FLOATING COCI COMPANION WIDGET (Your Friendly Guide - No Name Prompt)
+      ==================================================================== */}
+      <aside className="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-2 pointer-events-auto select-none">
+        {!cociMinimized && (
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-emerald-200/90 max-w-xs sm:max-w-sm space-y-2.5 animate-in slide-in-from-bottom-2 fade-in duration-200">
+            <div className="flex items-center justify-between gap-3 border-b border-grey-100 pb-2">
+              <div className="flex items-center gap-2">
+                <img src="/guided/coci_head.webp" alt="Coci" className="w-6 h-6 rounded-full bg-emerald-100 p-0.5" />
+                <span className="font-bold text-xs text-grey-900">Coci, your guide</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCociMinimized(true)}
+                className="w-5 h-5 rounded-md hover:bg-grey-100 text-grey-400 hover:text-grey-800 flex items-center justify-center transition-colors cursor-pointer"
+                title="Minimize Coci"
+              >
+                <Minimize2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-grey-700 leading-relaxed">
+              {COCI_TIPS[step]?.message || 'I’m here to guide you through configuring your program curriculum.'}
+            </p>
+
+            {STEP_VIDEOS[step] && (
+              <div className="pt-1 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveVideo(STEP_VIDEOS[step]);
+                    Sound.pop();
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer shadow-2xs"
+                >
+                  <Play className="w-3 h-3 fill-current ml-0.5" />
+                  <span>Watch lesson ({STEP_VIDEOS[step].duration})</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Coci Mascot Avatar Button */}
+        <button
+          type="button"
+          onClick={() => {
+            setCociMinimized(!cociMinimized);
+            Sound.tick();
+          }}
+          className="group relative flex items-center justify-center cursor-pointer transition-transform hover:scale-105 active:scale-95"
+          title={cociMinimized ? "Open Coci's tips" : "Minimize Coci"}
+        >
+          <div className="w-14 h-14 rounded-full bg-emerald-500/10 border-2 border-emerald-500/40 p-1 shadow-lg bg-white overflow-hidden flex items-center justify-center">
+            <img
+              src={COCI_TIPS[step]?.mood || '/guided/coci.webp'}
+              alt="Coci Mascot"
+              className="w-full h-full object-contain pointer-events-none drop-shadow-xs"
+            />
+          </div>
+          {cociMinimized && (
+            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full animate-pulse" />
+          )}
+        </button>
+      </aside>
     </div>
   );
 };
