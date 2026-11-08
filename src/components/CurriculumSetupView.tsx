@@ -21,6 +21,8 @@ import {
   MapPin,
   User,
   Folder,
+  Plus,
+  Trash2,
 } from 'lucide-react';
 import { Organization } from '../types';
 import { toast } from '../lib/toast';
@@ -344,6 +346,158 @@ export const CurriculumSetupView: React.FC<CurriculumSetupViewProps> = ({
   const [phoneParticipated, setPhoneParticipated] = useState('Yes');
   const [phoneGoalsMet, setPhoneGoalsMet] = useState('Yes');
   const [phonePromptLevel, setPhonePromptLevel] = useState('Verbal');
+
+  // Manual builder state for Objectives (media_1794072521860_fb9b3188.jpg)
+  const [objectiveMode, setObjectiveMode] = useState<'choice' | 'manual'>('choice');
+  const [manualObjectiveTitle, setManualObjectiveTitle] = useState('');
+  const [manualObjectiveDesc, setManualObjectiveDesc] = useState('');
+  const [objectivesList, setObjectivesList] = useState<Array<{ id: string; title: string; desc: string }>>([
+    { id: 'obj-1', title: 'Daily living', desc: 'Participant will develop skills they can use for daily living.' },
+    { id: 'obj-2', title: 'Employment skill', desc: 'Participant will practice workplace readiness and vocational tasks.' },
+  ]);
+
+  // Manual builder state for Trainings & Activities (media_1794072863356_3b0d21bb.jpg)
+  const [trainingMode, setTrainingMode] = useState<'choice' | 'manual'>('choice');
+  const [manualTrainingTitle, setManualTrainingTitle] = useState('');
+  const [manualActivities, setManualActivities] = useState<string[]>([]);
+  const [newActivityInput, setNewActivityInput] = useState('');
+  const [isAddingActivity, setIsAddingActivity] = useState(false);
+  const [trainingsList, setTrainingsList] = useState<Array<{ id: string; title: string; activities: string[] }>>([
+    { id: 'trn-1', title: 'Vocational Skills', activities: ['Football', 'Basketball'] },
+    { id: 'trn-2', title: 'Employment Skills', activities: ['Writing a CV', 'Drafting email'] },
+  ]);
+
+  // Manual builder state for Universal Tasks
+  const [taskMode, setTaskMode] = useState<'choice' | 'manual'>('choice');
+  const [manualTaskTitle, setManualTaskTitle] = useState('');
+  const [manualTaskCategory, setManualTaskCategory] = useState('Execution');
+  const [manualTaskDesc, setManualTaskDesc] = useState('');
+  const [tasksList, setTasksList] = useState<Array<{ id: string; name: string; category: string; desc: string; enabled: boolean }>>([
+    { id: 'TSK-101', name: 'Follow Activity Instructions', category: 'Execution', desc: 'Follows 2-step verbal prompt without repetition', enabled: true },
+    { id: 'TSK-102', name: 'Complete Assigned Work', category: 'Independence', desc: 'Finishes station assignments within session', enabled: true },
+    { id: 'TSK-103', name: 'Maintain Engagement', category: 'Focus', desc: 'Remains on task during 20-min block', enabled: true },
+    { id: 'TSK-104', name: 'Demonstrate Responsibility', category: 'Social', desc: 'Returns equipment and tidies workstation', enabled: true },
+    { id: 'TSK-105', name: 'Manage Materials Properly', category: 'Safety', desc: 'Uses safety scissors and tools appropriately', enabled: true },
+  ]);
+
+  // Handlers for manual additions
+  const handleAddObjective = () => {
+    if (!manualObjectiveTitle.trim()) {
+      toast.warning('Title Required', 'Please enter an objective title.');
+      return;
+    }
+    setObjectivesList((prev) => [
+      ...prev,
+      {
+        id: `obj-${Date.now()}`,
+        title: manualObjectiveTitle.trim(),
+        desc: manualObjectiveDesc.trim() || 'Custom service line objective for client development.',
+      },
+    ]);
+    setManualObjectiveTitle('');
+    setManualObjectiveDesc('');
+    toast.success('Objective Added', `Added "${manualObjectiveTitle.trim()}".`);
+  };
+
+  const handleAddActivity = () => {
+    if (newActivityInput.trim()) {
+      setManualActivities((prev) => [...prev, newActivityInput.trim()]);
+      setNewActivityInput('');
+      setIsAddingActivity(false);
+      toast.info('Activity Added', `Added "${newActivityInput.trim()}".`);
+    }
+  };
+
+  const handleAddTraining = () => {
+    if (!manualTrainingTitle.trim()) {
+      toast.warning('Title Required', 'Please enter a training component name.');
+      return;
+    }
+    setTrainingsList((prev) => [
+      ...prev,
+      {
+        id: `trn-${Date.now()}`,
+        title: manualTrainingTitle.trim(),
+        activities: manualActivities.length > 0 ? manualActivities : ['Core practice activity'],
+      },
+    ]);
+    setManualTrainingTitle('');
+    setManualActivities([]);
+    toast.success('Training Added', `Added "${manualTrainingTitle.trim()}".`);
+  };
+
+  const handleAddTask = () => {
+    if (!manualTaskTitle.trim()) {
+      toast.warning('Title Required', 'Please enter a task name.');
+      return;
+    }
+    setTasksList((prev) => [
+      ...prev,
+      {
+        id: `TSK-${100 + prev.length + 1}`,
+        name: manualTaskTitle.trim(),
+        category: manualTaskCategory,
+        desc: manualTaskDesc.trim() || 'Evaluates client progress and independence during shift.',
+        enabled: true,
+      },
+    ]);
+    setManualTaskTitle('');
+    setManualTaskDesc('');
+    toast.success('Task Added', `Added "${manualTaskTitle.trim()}".`);
+  };
+
+  // Reusable Top-Left Stepper matching media_1794072521860_fb9b3188.jpg & media_1794072863356_3b0d21bb.jpg
+  const renderTopLeftStepper = (currentStep: number) => (
+    <div className="flex items-center gap-1.5 sm:gap-2 mb-6">
+      {[1, 2, 3, 4, 5, 6].map((num) => {
+        const isCurrent = currentStep === num;
+        const isPast = currentStep > num;
+        return (
+          <button
+            key={num}
+            type="button"
+            onClick={() => {
+              const stepMap: Record<number, CurriculumStep> = {
+                1: 'objectives',
+                2: 'trainings',
+                3: 'tasks',
+                4: 'behavior',
+                5: 'calendar',
+                6: 'daily-note',
+              };
+              if (stepMap[num]) setStep(stepMap[num]);
+            }}
+            className={cn(
+              'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer',
+              isCurrent
+                ? 'bg-[#0A0A0A] text-white shadow-xs ring-2 ring-black/15 scale-105'
+                : isPast
+                ? 'bg-grey-200 text-grey-800 hover:bg-grey-300'
+                : 'bg-grey-100 text-grey-400 hover:bg-grey-200'
+            )}
+            title={`Go to Step ${num}`}
+          >
+            {num}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  // Soft decorative background wavy ribbon for explanation panels
+  const renderPanelRibbon = (colorClass: string) => (
+    <div className={cn("absolute -top-6 -right-6 w-56 h-56 pointer-events-none opacity-20 select-none", colorClass)}>
+      <svg viewBox="0 0 200 200" fill="none" className="w-full h-full text-current">
+        <path
+          d="M20,20 C80,80 140,20 180,80 C220,140 160,200 100,180"
+          stroke="currentColor"
+          strokeWidth="30"
+          strokeLinecap="round"
+          fill="none"
+        />
+      </svg>
+    </div>
+  );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -671,616 +825,1203 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
       {/* ====================================================================
           SCREEN 2: STEP 1 OF 6 - OBJECTIVES SETUP
       ==================================================================== */}
-      {step === 'objectives' && (
+            {step === 'objectives' && (
         <div className="flex-1 flex flex-col md:flex-row items-stretch min-h-screen">
-          {/* Left Side: Title, 2 Cards, & Skip Link */}
-          <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-start">
-            {/* Top Navigation & Header */}
-            <div className="flex items-start gap-4 mb-8">
-              <button
-                type="button"
-                onClick={() => setStep('overview')}
-                className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 mt-1 shadow-2xs"
-                title="Back to curriculum cards"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-
-              <div className="space-y-1">
-                <h1 className="font-sans font-bold text-2xl sm:text-3xl lg:text-4xl text-grey-900 tracking-tight">
-                  We’ll start with setting up your objectives.
-                </h1>
-                <p className="text-xs sm:text-sm text-grey-500">
-                  Pick whichever way feels easier — upload a bunch at once, or build them out yourself as you go.
-                </p>
-              </div>
-            </div>
-
-            {/* 2 Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 max-w-4xl">
-              {/* Card 1: Got a lot to add? */}
-              <div className="p-6 sm:p-7 rounded-3xl border border-grey-200/90 bg-white hover:border-grey-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
-                <div>
-                  <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
-                    Got a lot to add?
-                  </h3>
-                  <p className="text-xs sm:text-[13px] text-grey-500 mt-2 leading-relaxed">
-                    Grab our template, fill it in, and upload everything in one go — no need to type each one manually.
-                  </p>
-
-                  <div className="flex items-center gap-2.5 pt-5">
-                    <button
-                      type="button"
-                      onClick={() => setDownloadModal('downloading')}
-                      className="px-4 py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
-                    >
-                      <span>Download template</span>
-                      <Download className="w-3.5 h-3.5" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="px-4 py-2.5 rounded-xl bg-white hover:bg-grey-50 text-grey-800 font-semibold text-xs border border-grey-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                    >
-                      <span>Upload</span>
-                      <Upload className="w-3.5 h-3.5 text-grey-500" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="pt-6 mt-auto">
-                  <img
-                    src={objectiveFolderImg}
-                    alt="Got a lot to add template folder"
-                    className="w-full max-h-48 sm:max-h-52 object-contain object-bottom"
-                  />
-                </div>
-              </div>
-
-              {/* Card 2: Prefer to build it yourself? */}
-              <div className="p-6 sm:p-7 rounded-3xl border border-grey-200/90 bg-white hover:border-grey-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
-                <div>
-                  <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
-                    Prefer to build it yourself?
-                  </h3>
-                  <p className="text-xs sm:text-[13px] text-grey-500 mt-2 leading-relaxed">
-                    No problem — you can add and tweak objectives manually whenever you're ready.
-                  </p>
-
-                  <div className="pt-5">
-                    <button
-                      type="button"
-                      onClick={() => setStep('trainings')}
-                      className="px-5 py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
-                    >
-                      <span>Let's go</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="pt-6 mt-auto">
-                  <img
-                    src={objectiveBlocksImg}
-                    alt="Prefer to build it yourself lego blocks"
-                    className="w-full max-h-48 sm:max-h-52 object-contain object-bottom"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Skip Link - Located directly beneath cards so it is never lost */}
-            <div className="mt-8 pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setStep('trainings');
-                  toast.info('Skipped Objectives', 'Moved to trainings & activities setup.');
-                }}
-                className="text-xs sm:text-sm font-medium text-grey-500 hover:text-grey-900 underline underline-offset-4 transition-colors cursor-pointer"
-              >
-                Skip for now
-              </button>
-            </div>
-          </div>
-
-          {/* Right Side: Informational Context Panel with Page Numbering Atop */}
-          <div className="w-full md:w-[380px] lg:w-[420px] bg-[#DCE5FE] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-blue-100/60">
-            <div className="space-y-6 z-10">
-              {/* Page Numbering Atop Explanation Segment */}
-              {renderStepProgressPills(1)}
-
-              <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-sm text-grey-900">
-                    What is an objective
-                  </h4>
-                  <div className="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center text-amber-700">
-                    <FileText className="w-3.5 h-3.5" />
-                  </div>
-                </div>
-                <p className="text-xs text-grey-600 leading-relaxed">
-                  Think of objectives as the goals you're working toward with each client — what success looks like for them. They help guide care, shape support plans, and let you track progress over time.{' '}
+          {objectiveMode === 'choice' ? (
+            /* CHOICE VIEW (2 Cards: Template vs Prefer to build it yourself) */
+            <>
+              <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-start">
+                <div className="flex items-start gap-4 mb-8">
                   <button
                     type="button"
-                    onClick={() => toast.info('About Objectives', 'Objectives define measurable goals tied to ISP plans.')}
-                    className="font-semibold text-brand-800 underline hover:text-brand-950 inline cursor-pointer"
+                    onClick={() => setStep('overview')}
+                    className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 mt-1 shadow-2xs"
+                    title="Back to curriculum cards"
                   >
-                    Learn more
+                    <ChevronLeft className="w-4 h-4" />
                   </button>
-                </p>
-              </div>
 
-              <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-3.5 relative overflow-hidden">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-sm text-grey-900">
-                    A few examples to get you started
-                  </h4>
-                  <div className="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center text-amber-700">
-                    <FileText className="w-3.5 h-3.5" />
+                  <div className="space-y-1">
+                    <h1 className="font-sans font-bold text-2xl sm:text-3xl lg:text-4xl text-grey-900 tracking-tight">
+                      We’ll start with setting up your objectives.
+                    </h1>
+                    <p className="text-xs sm:text-sm text-grey-500">
+                      Pick whichever way feels easier — upload a bunch at once, or build them out yourself as you go.
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-1.5">
-                  {[
-                    'Daily living',
-                    'Employment skill',
-                    'Time management',
-                    'Personal wellness',
-                    'Safety awareness',
-                  ].map((eg, i) => (
-                    <span
-                      key={i}
-                      className="px-3 py-1 rounded-lg bg-[#EAEFFE] text-indigo-950 text-xs font-medium"
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 max-w-4xl">
+                  {/* Card 1: Got a lot to add? */}
+                  <div className="p-6 sm:p-7 rounded-3xl border border-grey-200/90 bg-white hover:border-grey-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
+                    <div>
+                      <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
+                        Got a lot to add?
+                      </h3>
+                      <p className="text-xs sm:text-[13px] text-grey-500 mt-2 leading-relaxed">
+                        Grab our template, fill it in, and upload everything in one go — no need to type each one manually.
+                      </p>
+
+                      <div className="flex items-center gap-2.5 pt-5">
+                        <button
+                          type="button"
+                          onClick={() => setDownloadModal('downloading')}
+                          className="px-4 py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                        >
+                          <span>Download template</span>
+                          <Download className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="px-4 py-2.5 rounded-xl bg-white hover:bg-grey-50 text-grey-800 font-semibold text-xs border border-grey-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                        >
+                          <span>Upload</span>
+                          <Upload className="w-3.5 h-3.5 text-grey-500" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="pt-6 mt-auto">
+                      <img
+                        src={objectiveFolderImg}
+                        alt="Got a lot to add template folder"
+                        className="w-full max-h-48 sm:max-h-52 object-contain object-bottom"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Card 2: Prefer to build it yourself? -> ENTERS MANUAL BUILDER */}
+                  <div className="p-6 sm:p-7 rounded-3xl border border-grey-200/90 bg-white hover:border-grey-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
+                    <div>
+                      <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
+                        Prefer to build it yourself?
+                      </h3>
+                      <p className="text-xs sm:text-[13px] text-grey-500 mt-2 leading-relaxed">
+                        No problem — you can add and tweak objectives manually whenever you're ready.
+                      </p>
+
+                      <div className="pt-5">
+                        <button
+                          type="button"
+                          onClick={() => setObjectiveMode('manual')}
+                          className="px-5 py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                        >
+                          <span>Let's go</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="pt-6 mt-auto">
+                      <img
+                        src={objectiveBlocksImg}
+                        alt="Prefer to build it yourself lego blocks"
+                        className="w-full max-h-48 sm:max-h-52 object-contain object-bottom"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep('trainings');
+                      setTrainingMode('choice');
+                      toast.info('Skipped Objectives', 'Moved to trainings & activities setup.');
+                    }}
+                    className="text-xs sm:text-sm font-medium text-grey-500 hover:text-grey-900 underline underline-offset-4 transition-colors cursor-pointer"
+                  >
+                    Skip for now
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Side Info Panel */}
+              <div className="w-full md:w-[380px] lg:w-[420px] bg-[#DCE5FE] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-blue-100/60">
+                {renderPanelRibbon('text-blue-400')}
+                <div className="space-y-6 z-10">
+                  {renderStepProgressPills(1)}
+                  <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">What is an objective</h4>
+                      <div className="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center text-amber-700">
+                        <FileText className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+                    <p className="text-xs text-grey-600 leading-relaxed">
+                      Think of objectives as the goals you're working toward with each client — what success looks like for them. They help guide care, shape support plans, and let you track progress over time.{' '}
+                      <button
+                        type="button"
+                        onClick={() => toast.info('About Objectives', 'Objectives define measurable goals tied to ISP plans.')}
+                        className="font-semibold text-brand-800 underline hover:text-brand-950 inline cursor-pointer"
+                      >
+                        Learn more
+                      </button>
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-3.5 relative overflow-hidden">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">A few examples to get you started</h4>
+                      <div className="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center text-amber-700">
+                        <FileText className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5">
+                      {['Daily living', 'Employment skill', 'Time management', 'Personal wellness', 'Safety awareness'].map((tag) => (
+                        <span key={tag} className="px-3 py-1.5 rounded-full text-xs font-medium bg-blue-50 text-blue-900 border border-blue-100">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex -space-x-2 items-center justify-end pt-1">
+                      {VERIFIED_CARE_AVATARS.slice(0, 3).map((av, idx) => (
+                        <img key={idx} src={av} alt="Care avatar" onError={handleImageError} className="w-7 h-7 rounded-full object-cover border-2 border-white shadow-2xs" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-6 text-xs text-grey-500 text-right z-10">
+                  After objectives, you'll set up your trainings.
+                </div>
+              </div>
+            </>
+          ) : (
+            /* MANUAL OBJECTIVES BUILDER (EXACT MATCH TO media_1794072521860_fb9b3188.jpg) */
+            <>
+              <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-between overflow-y-auto">
+                <div className="space-y-6 max-w-3xl">
+                  {/* Top-Left Stepper */}
+                  {renderTopLeftStepper(1)}
+
+                  {/* Back button to choice */}
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setObjectiveMode('choice')}
+                      className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shadow-2xs mb-4"
+                      title="Back to options"
                     >
-                      {eg}
-                    </span>
-                  ))}
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+
+                    <h1 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
+                      Manually fill your program objectives
+                    </h1>
+                    <p className="text-xs sm:text-sm text-grey-500 mt-1">
+                      Add objectives one by one
+                    </p>
+                  </div>
+
+                  {/* Card for typing objective */}
+                  <div className="bg-white rounded-2xl border border-grey-200/90 p-5 sm:p-6 shadow-2xs space-y-3">
+                    <input
+                      type="text"
+                      value={manualObjectiveTitle}
+                      onChange={(e) => setManualObjectiveTitle(e.target.value)}
+                      placeholder="Add a new objective eg. 'Daily living'"
+                      className="w-full text-xs sm:text-sm font-semibold text-grey-900 border-0 focus:outline-none placeholder:text-grey-400 placeholder:font-normal py-1"
+                    />
+
+                    <textarea
+                      value={manualObjectiveDesc}
+                      onChange={(e) => setManualObjectiveDesc(e.target.value)}
+                      placeholder="Add a description of your objective eg., This program will help the client develop skills they can use for daily living."
+                      rows={2}
+                      className="w-full text-xs text-grey-700 border-0 focus:outline-none placeholder:text-grey-400 py-1 resize-none"
+                    />
+
+                    <div className="flex justify-end pt-2">
+                      <button
+                        type="button"
+                        onClick={handleAddObjective}
+                        className={cn(
+                          "px-5 py-2.5 rounded-full text-xs font-semibold text-white transition-all cursor-pointer shadow-xs",
+                          manualObjectiveTitle.trim() ? "bg-[#0A0A0A] hover:bg-neutral-800" : "bg-[#8E9093] hover:bg-grey-700"
+                        )}
+                      >
+                        Add objective
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Added Objectives List */}
+                  {objectivesList.length > 0 && (
+                    <div className="space-y-3 pt-2">
+                      <div className="text-xs font-bold text-grey-500 uppercase tracking-wider">
+                        Program Objectives ({objectivesList.length})
+                      </div>
+                      <div className="space-y-2.5">
+                        {objectivesList.map((obj) => (
+                          <div
+                            key={obj.id}
+                            className="p-4 rounded-xl border border-grey-200 bg-white shadow-2xs flex items-start justify-between gap-3 group"
+                          >
+                            <div>
+                              <div className="font-bold text-xs sm:text-sm text-grey-900 flex items-center gap-2">
+                                <span>{obj.title}</span>
+                                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-100">
+                                  Active Objective
+                                </span>
+                              </div>
+                              <p className="text-xs text-grey-600 mt-1 leading-relaxed">
+                                {obj.desc}
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setObjectivesList((prev) => prev.filter((o) => o.id !== obj.id));
+                                toast.info('Objective Removed', `Deleted "${obj.title}".`);
+                              }}
+                              className="text-grey-400 hover:text-red-500 transition-colors p-1"
+                              title="Delete objective"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="pt-3 flex justify-end">
-                  <div className="flex -space-x-2.5 items-center">
-                    <img
-                      src={VERIFIED_CARE_AVATARS[4]}
-                      alt="Caregiver"
-                      onError={handleImageError}
-                      className="w-8 h-8 rounded-full object-cover border-2 border-white"
-                    />
-                    <img
-                      src={VERIFIED_CARE_AVATARS[0]}
-                      alt="Caregiver"
-                      onError={handleImageError}
-                      className="w-8 h-8 rounded-full object-cover border-2 border-white z-10"
-                    />
-                    <img
-                      src={VERIFIED_CARE_AVATARS[5]}
-                      alt="Participant"
-                      onError={handleImageError}
-                      className="w-8 h-8 rounded-full object-cover border-2 border-white z-20"
-                    />
-                  </div>
+                {/* Bottom Actions */}
+                <div className="pt-8 border-t border-grey-100 flex items-center justify-between mt-8">
+                  <button
+                    type="button"
+                    onClick={() => setObjectiveMode('choice')}
+                    className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-700 transition-colors cursor-pointer"
+                  >
+                    Back to choices
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep('trainings');
+                      setTrainingMode('choice');
+                      toast.success('Objectives Saved', 'Moving to trainings & activities setup.');
+                    }}
+                    className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
+                  >
+                    <span>Continue to trainings</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
-            </div>
 
-            <div className="pt-8 text-xs text-grey-500 italic text-right z-10 font-medium">
-              After objectives, you'll set up your trainings.
-            </div>
-          </div>
+              {/* Right Side Panel (Matching Image 4) */}
+              <div className="w-full md:w-[380px] lg:w-[420px] bg-[#DCE5FE] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-blue-100/60">
+                {renderPanelRibbon('text-blue-400')}
+                <button
+                  type="button"
+                  onClick={onReturnToDashboard}
+                  className="absolute top-6 right-6 w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-grey-600 hover:text-grey-900 transition-colors cursor-pointer z-20"
+                  title="Close and return to dashboard"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+
+                <div className="space-y-6 z-10 pt-4">
+                  <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">What is an objective</h4>
+                      <div className="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center text-amber-700">
+                        <FileText className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+                    <p className="text-xs text-grey-600 leading-relaxed">
+                      Think of objectives as the goals you're working toward with each client — what success looks like for them. They help guide care, shape support plans, and let you track progress over time. Want the full picture?{' '}
+                      <button
+                        type="button"
+                        onClick={() => toast.info('About Objectives', 'Objectives define measurable goals tied to ISP plans.')}
+                        className="font-semibold text-brand-800 underline hover:text-brand-950 inline cursor-pointer"
+                      >
+                        Learn more
+                      </button>
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-3.5 relative overflow-hidden">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">A few examples to get you started</h4>
+                      <div className="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center text-amber-700">
+                        <FileText className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5">
+                      {['Daily living', 'Employment skill', 'Time management', 'Personal wellness', 'Safety awareness'].map((tag) => (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => {
+                            setManualObjectiveTitle(tag);
+                            setManualObjectiveDesc(`This program will help the client develop skills in ${tag.toLowerCase()}.`);
+                            toast.info(`Example selected`, `Pre-filled "${tag}".`);
+                          }}
+                          className="px-3 py-1.5 rounded-full text-xs font-medium bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-100 transition-colors cursor-pointer"
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex -space-x-2 items-center justify-end pt-1">
+                      {VERIFIED_CARE_AVATARS.slice(0, 3).map((av, idx) => (
+                        <img key={idx} src={av} alt="Care avatar" onError={handleImageError} className="w-7 h-7 rounded-full object-cover border-2 border-white shadow-2xs" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-6 text-xs text-grey-500 text-right z-10 font-medium">
+                  After objectives, you'll set up your trainings.
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
 
-      {/* ====================================================================
-          SCREEN 3: STEP 2 OF 6 - TRAININGS & ACTIVITIES
-      ==================================================================== */}
       {step === 'trainings' && (
         <div className="flex-1 flex flex-col md:flex-row items-stretch min-h-screen">
-          {/* Left Side: Title, 2 Cards, & Skip Link */}
-          <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-start">
-            {/* Top Navigation & Header */}
-            <div className="flex items-start gap-4 mb-8">
-              <button
-                type="button"
-                onClick={() => setStep('objectives')}
-                className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 mt-1 shadow-2xs"
-                title="Back to objectives"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-
-              <div className="space-y-1">
-                <h1 className="font-sans font-bold text-2xl sm:text-3xl lg:text-4xl text-grey-900 tracking-tight">
-                  Now, let's set up your trainings & activities.
-                </h1>
-                <p className="text-xs sm:text-sm text-grey-500">
-                  Pick whichever way feels easier — upload a bunch at once, or build them out yourself as you go.
-                </p>
-              </div>
-            </div>
-
-            {/* 2 Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 max-w-4xl">
-              {/* Card 1: Got a lot to add? */}
-              <div className="p-6 sm:p-7 rounded-3xl border border-grey-200/90 bg-white hover:border-grey-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
-                <div>
-                  <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
-                    Got a lot to add?
-                  </h3>
-                  <p className="text-xs sm:text-[13px] text-grey-500 mt-2 leading-relaxed">
-                    Grab our template, fill it in, and upload everything in one go — no need to type each one manually.
-                  </p>
-
-                  <div className="flex items-center gap-2.5 pt-5">
-                    <button
-                      type="button"
-                      onClick={() => setDownloadModal('downloading')}
-                      className="px-4 py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
-                    >
-                      <span>Download template</span>
-                      <Download className="w-3.5 h-3.5" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="px-4 py-2.5 rounded-xl bg-white hover:bg-grey-50 text-grey-800 font-semibold text-xs border border-grey-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                    >
-                      <span>Upload</span>
-                      <Upload className="w-3.5 h-3.5 text-grey-500" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="pt-6 mt-auto">
-                  <img
-                    src={objectiveFolderImg}
-                    alt="Got a lot to add template folder"
-                    className="w-full max-h-48 sm:max-h-52 object-contain object-bottom"
-                  />
-                </div>
-              </div>
-
-              {/* Card 2: Prefer to build it yourself? */}
-              <div className="p-6 sm:p-7 rounded-3xl border border-grey-200/90 bg-white hover:border-grey-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
-                <div>
-                  <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
-                    Prefer to build it yourself?
-                  </h3>
-                  <p className="text-xs sm:text-[13px] text-grey-500 mt-2 leading-relaxed">
-                    No problem — you can add and tweak trainings manually whenever you're ready.
-                  </p>
-
-                  <div className="pt-5">
-                    <button
-                      type="button"
-                      onClick={() => setStep('tasks')}
-                      className="px-5 py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
-                    >
-                      <span>Let's go</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="pt-6 mt-auto">
-                  <img
-                    src={objectiveBlocksImg}
-                    alt="Prefer to build it yourself lego blocks"
-                    className="w-full max-h-48 sm:max-h-52 object-contain object-bottom"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Skip Link - Located directly beneath cards so it is never lost */}
-            <div className="mt-8 pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setStep('tasks');
-                  toast.info('Skipped Trainings', 'Moved to universal task set setup.');
-                }}
-                className="text-xs sm:text-sm font-medium text-grey-500 hover:text-grey-900 underline underline-offset-4 transition-colors cursor-pointer"
-              >
-                Skip for now
-              </button>
-            </div>
-          </div>
-
-          {/* Right Side: Informational Context Panel with Page Numbering Atop */}
-          <div className="w-full md:w-[380px] lg:w-[420px] bg-[#D8ECC3]/70 p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-emerald-100/60">
-            <div className="space-y-6 z-10">
-              {/* Page Numbering Atop Explanation Segment */}
-              {renderStepProgressPills(2)}
-
-              <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-sm text-grey-900">
-                    What is a training & activity?
-                  </h4>
-                  <div className="w-6 h-6 rounded-md bg-emerald-100 flex items-center justify-center text-emerald-700">
-                    <FileText className="w-3.5 h-3.5" />
-                  </div>
-                </div>
-                <p className="text-xs text-grey-600 leading-relaxed">
-                  Trainings organize client development into practical, recurring skill areas and group sessions. They guide staff on scheduled activities that support growth.{' '}
+          {trainingMode === 'choice' ? (
+            /* CHOICE VIEW */
+            <>
+              <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-start">
+                <div className="flex items-start gap-4 mb-8">
                   <button
                     type="button"
-                    onClick={() => toast.info('About Trainings', 'Trainings structure daily group and 1:1 sessions.')}
-                    className="font-semibold text-brand-800 underline hover:text-brand-950 inline cursor-pointer"
+                    onClick={() => { setStep('objectives'); setObjectiveMode('choice'); }}
+                    className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 mt-1 shadow-2xs"
+                    title="Back to objectives"
                   >
-                    Learn more
+                    <ChevronLeft className="w-4 h-4" />
                   </button>
-                </p>
-              </div>
 
-              <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-3.5 relative overflow-hidden">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-sm text-grey-900">
-                    A few examples to get you started
-                  </h4>
-                  <div className="w-6 h-6 rounded-md bg-emerald-100 flex items-center justify-center text-emerald-700">
-                    <FileText className="w-3.5 h-3.5" />
+                  <div className="space-y-1">
+                    <h1 className="font-sans font-bold text-2xl sm:text-3xl lg:text-4xl text-grey-900 tracking-tight">
+                      Now, let's set up your trainings & activities.
+                    </h1>
+                    <p className="text-xs sm:text-sm text-grey-500">
+                      Pick whichever way feels easier — upload a bunch at once, or build them out yourself as you go.
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-1.5">
-                  {[
-                    'Culinary & Meal Prep',
-                    'Computer & Vocational Skills',
-                    'Community Outing & Safety',
-                    'Sensory Art & Expression',
-                    'Physical Fitness & Mobility',
-                  ].map((eg, i) => (
-                    <span
-                      key={i}
-                      className="px-3 py-1 rounded-lg bg-emerald-50 text-emerald-950 text-xs font-medium border border-emerald-100"
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 max-w-4xl">
+                  {/* Card 1: Got a lot to add? */}
+                  <div className="p-6 sm:p-7 rounded-3xl border border-grey-200/90 bg-white hover:border-grey-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
+                    <div>
+                      <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
+                        Got a lot to add?
+                      </h3>
+                      <p className="text-xs sm:text-[13px] text-grey-500 mt-2 leading-relaxed">
+                        Grab our template, fill it in, and upload everything in one go — no need to type each one manually.
+                      </p>
+
+                      <div className="flex items-center gap-2.5 pt-5">
+                        <button
+                          type="button"
+                          onClick={() => setDownloadModal('downloading')}
+                          className="px-4 py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                        >
+                          <span>Download template</span>
+                          <Download className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="px-4 py-2.5 rounded-xl bg-white hover:bg-grey-50 text-grey-800 font-semibold text-xs border border-grey-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                        >
+                          <span>Upload</span>
+                          <Upload className="w-3.5 h-3.5 text-grey-500" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="pt-6 mt-auto">
+                      <img
+                        src={objectiveFolderImg}
+                        alt="Trainings folder"
+                        className="w-full max-h-48 sm:max-h-52 object-contain object-bottom"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Card 2: Prefer to build it yourself? */}
+                  <div className="p-6 sm:p-7 rounded-3xl border border-grey-200/90 bg-white hover:border-grey-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
+                    <div>
+                      <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
+                        Prefer to build it yourself?
+                      </h3>
+                      <p className="text-xs sm:text-[13px] text-grey-500 mt-2 leading-relaxed">
+                        No problem — you can add and tweak trainings manually whenever you're ready.
+                      </p>
+
+                      <div className="pt-5">
+                        <button
+                          type="button"
+                          onClick={() => setTrainingMode('manual')}
+                          className="px-5 py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                        >
+                          <span>Let's go</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="pt-6 mt-auto">
+                      <img
+                        src={objectiveBlocksImg}
+                        alt="Trainings lego blocks"
+                        className="w-full max-h-48 sm:max-h-52 object-contain object-bottom"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep('tasks');
+                      setTaskMode('choice');
+                      toast.info('Skipped Trainings', 'Moved to universal task set.');
+                    }}
+                    className="text-xs sm:text-sm font-medium text-grey-500 hover:text-grey-900 underline underline-offset-4 transition-colors cursor-pointer"
+                  >
+                    Skip for now
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Side Panel */}
+              <div className="w-full md:w-[380px] lg:w-[420px] bg-[#E8F8D8] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-emerald-100">
+                {renderPanelRibbon('text-emerald-400')}
+                <div className="space-y-6 z-10">
+                  {renderStepProgressPills(2)}
+                  <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">What are training components?</h4>
+                      <div className="w-6 h-6 rounded-md bg-orange-100 flex items-center justify-center text-orange-700">
+                        <FileText className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+                    <p className="text-xs text-grey-600 leading-relaxed">
+                      Think of training components as the skills clients are developing. Activities are the practical experiences that help build those skills and support progress over time.{' '}
+                      <button
+                        type="button"
+                        onClick={() => toast.info('About Trainings', 'Training components connect daily activities to goals.')}
+                        className="font-semibold text-brand-800 underline hover:text-brand-950 inline cursor-pointer"
+                      >
+                        Learn more
+                      </button>
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-3.5 relative overflow-hidden">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">A few examples to get you started</h4>
+                      <div className="w-6 h-6 rounded-md bg-orange-100 flex items-center justify-center text-orange-700">
+                        <FileText className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5">
+                      {['Vocational Skills', 'Employment Skills', 'Music Skills', 'Cooking Club', 'Community Outing'].map((tag) => (
+                        <span key={tag} className="px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-900 border border-emerald-100">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex -space-x-2 items-center justify-end pt-1">
+                      {VERIFIED_CARE_AVATARS.slice(0, 3).map((av, idx) => (
+                        <img key={idx} src={av} alt="Care avatar" onError={handleImageError} className="w-7 h-7 rounded-full object-cover border-2 border-white shadow-2xs" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-6 text-xs text-grey-500 text-right z-10 font-medium">
+                  After trainings, you'll set up your tasks.
+                </div>
+              </div>
+            </>
+          ) : (
+            /* MANUAL TRAININGS & ACTIVITIES BUILDER (EXACT MATCH TO media_1794072863356_3b0d21bb.jpg) */
+            <>
+              <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-between overflow-y-auto">
+                <div className="space-y-6 max-w-3xl">
+                  {/* Top-Left Stepper */}
+                  {renderTopLeftStepper(2)}
+
+                  {/* Back button */}
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setTrainingMode('choice')}
+                      className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shadow-2xs mb-4"
+                      title="Back to options"
                     >
-                      {eg}
-                    </span>
-                  ))}
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+
+                    <h1 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
+                      Manually fill your training components and activities
+                    </h1>
+                    <p className="text-xs sm:text-sm text-grey-500 mt-1">
+                      Add training components and activities one by one
+                    </p>
+                  </div>
+
+                  {/* Card for typing training component and nested activities */}
+                  <div className="bg-white rounded-2xl border border-grey-200/90 p-5 sm:p-6 shadow-2xs space-y-4">
+                    <input
+                      type="text"
+                      value={manualTrainingTitle}
+                      onChange={(e) => setManualTrainingTitle(e.target.value)}
+                      placeholder="Add a new training component eg. 'Vocational Skills'"
+                      className="w-full text-xs sm:text-sm font-semibold text-grey-900 border-0 focus:outline-none placeholder:text-grey-400 placeholder:font-normal py-1"
+                    />
+
+                    {/* Activities List for this component */}
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {manualActivities.map((act, idx) => (
+                          <span
+                            key={idx}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200"
+                          >
+                            <span>{act}</span>
+                            <button
+                              type="button"
+                              onClick={() => setManualActivities((prev) => prev.filter((_, i) => i !== idx))}
+                              className="hover:text-red-600 transition-colors cursor-pointer"
+                              title="Remove activity"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+
+                        {isAddingActivity ? (
+                          <div className="flex items-center gap-1.5">
+                            <input
+                              type="text"
+                              value={newActivityInput}
+                              onChange={(e) => setNewActivityInput(e.target.value)}
+                              onKeyDown={(e) => { if (e.key === 'Enter') handleAddActivity(); }}
+                              placeholder="Activity name (e.g. Football)"
+                              className="px-3 py-1 rounded-full text-xs border border-emerald-400 bg-white focus:outline-none"
+                              autoFocus
+                            />
+                            <button
+                              type="button"
+                              onClick={handleAddActivity}
+                              className="px-2.5 py-1 rounded-full bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700"
+                            >
+                              Add
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => { setIsAddingActivity(false); setNewActivityInput(''); }}
+                              className="text-grey-400 hover:text-grey-600 text-xs"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setIsAddingActivity(true)}
+                            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors cursor-pointer"
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>Add activity</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end pt-2 border-t border-grey-100">
+                      <button
+                        type="button"
+                        onClick={handleAddTraining}
+                        className={cn(
+                          "px-5 py-2.5 rounded-full text-xs font-semibold text-white transition-all cursor-pointer shadow-xs",
+                          manualTrainingTitle.trim() ? "bg-[#0A0A0A] hover:bg-neutral-800" : "bg-[#8E9093] hover:bg-grey-700"
+                        )}
+                      >
+                        Add training
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Added Trainings List */}
+                  {trainingsList.length > 0 && (
+                    <div className="space-y-3 pt-2">
+                      <div className="text-xs font-bold text-grey-500 uppercase tracking-wider">
+                        Configured Trainings ({trainingsList.length})
+                      </div>
+                      <div className="space-y-2.5">
+                        {trainingsList.map((trn) => (
+                          <div
+                            key={trn.id}
+                            className="p-4 rounded-xl border border-grey-200 bg-white shadow-2xs flex items-start justify-between gap-3 group"
+                          >
+                            <div className="space-y-2">
+                              <div className="font-bold text-xs sm:text-sm text-grey-900 flex items-center gap-2">
+                                <span>{trn.title}</span>
+                                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-100">
+                                  {trn.activities.length} Activities
+                                </span>
+                              </div>
+                              <div className="flex flex-wrap gap-1.5">
+                                {trn.activities.map((act, aIdx) => (
+                                  <span key={aIdx} className="px-2.5 py-0.5 rounded-md text-[11px] font-medium bg-grey-100 text-grey-700">
+                                    {act}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setTrainingsList((prev) => prev.filter((t) => t.id !== trn.id));
+                                toast.info('Training Removed', `Deleted "${trn.title}".`);
+                              }}
+                              className="text-grey-400 hover:text-red-500 transition-colors p-1"
+                              title="Delete training"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="pt-3 flex justify-end">
-                  <div className="flex -space-x-2.5 items-center">
-                    <img
-                      src={VERIFIED_CARE_AVATARS[1]}
-                      alt="Trainer"
-                      onError={handleImageError}
-                      className="w-8 h-8 rounded-full object-cover border-2 border-white"
-                    />
-                    <img
-                      src={VERIFIED_CARE_AVATARS[0]}
-                      alt="Trainer"
-                      onError={handleImageError}
-                      className="w-8 h-8 rounded-full object-cover border-2 border-white z-10"
-                    />
-                    <img
-                      src={VERIFIED_CARE_AVATARS[3]}
-                      alt="Caregiver"
-                      onError={handleImageError}
-                      className="w-8 h-8 rounded-full object-cover border-2 border-white z-20"
-                    />
-                  </div>
+                {/* Bottom Actions */}
+                <div className="pt-8 border-t border-grey-100 flex items-center justify-between mt-8">
+                  <button
+                    type="button"
+                    onClick={() => setTrainingMode('choice')}
+                    className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-700 transition-colors cursor-pointer"
+                  >
+                    Back to choices
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep('tasks');
+                      setTaskMode('choice');
+                      toast.success('Trainings Saved', 'Moving to universal tasks setup.');
+                    }}
+                    className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
+                  >
+                    <span>Continue to tasks</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
-            </div>
 
-            <div className="pt-8 text-xs text-grey-600 italic text-right z-10 font-medium">
-              After trainings, you'll set up your tasks.
-            </div>
-          </div>
+              {/* Right Side Panel (Matching Image 5) */}
+              <div className="w-full md:w-[380px] lg:w-[420px] bg-[#E8F8D8] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-emerald-100">
+                {renderPanelRibbon('text-emerald-400')}
+                <button
+                  type="button"
+                  onClick={onReturnToDashboard}
+                  className="absolute top-6 right-6 w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-grey-600 hover:text-grey-900 transition-colors cursor-pointer z-20"
+                  title="Close and return to dashboard"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+
+                <div className="space-y-6 z-10 pt-4">
+                  <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">What are training components?</h4>
+                      <div className="w-6 h-6 rounded-md bg-orange-100 flex items-center justify-center text-orange-700">
+                        <FileText className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+                    <p className="text-xs text-grey-600 leading-relaxed">
+                      Think of training components as the skills clients are developing. Activities are the practical experiences that help build those skills and support progress over time. Want the full picture?{' '}
+                      <button
+                        type="button"
+                        onClick={() => toast.info('About Trainings', 'Training components connect daily activities to goals.')}
+                        className="font-semibold text-brand-800 underline hover:text-brand-950 inline cursor-pointer"
+                      >
+                        Learn more
+                      </button>
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-3.5 relative overflow-hidden">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">A few examples to get you started</h4>
+                      <div className="w-6 h-6 rounded-md bg-orange-100 flex items-center justify-center text-orange-700">
+                        <FileText className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        { title: 'Vocational Skills', isHeader: true },
+                        { title: 'Football', isHeader: false },
+                        { title: 'Basketball', isHeader: false },
+                        { title: 'Employment Skills', isHeader: true },
+                        { title: 'Writing a CV', isHeader: false },
+                        { title: 'Drafting email', isHeader: false },
+                        { title: 'Music Skills', isHeader: true },
+                        { title: 'Playing piano', isHeader: false },
+                        { title: 'Singing', isHeader: false },
+                      ].map((item, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            if (item.isHeader) {
+                              setManualTrainingTitle(item.title);
+                            } else {
+                              setManualActivities((prev) => prev.includes(item.title) ? prev : [...prev, item.title]);
+                            }
+                            toast.info('Example selected', `Added "${item.title}".`);
+                          }}
+                          className={cn(
+                            "px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer",
+                            item.isHeader
+                              ? "bg-emerald-100/90 text-emerald-950 border-emerald-300 font-semibold"
+                              : "bg-white/80 hover:bg-white text-emerald-900 border-emerald-200"
+                          )}
+                        >
+                          {item.title}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex -space-x-2 items-center justify-end pt-1">
+                      {VERIFIED_CARE_AVATARS.slice(0, 3).map((av, idx) => (
+                        <img key={idx} src={av} alt="Care avatar" onError={handleImageError} className="w-7 h-7 rounded-full object-cover border-2 border-white shadow-2xs" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-6 text-xs text-grey-500 text-right z-10 font-medium">
+                  After trainings, you'll set up your tasks.
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
 
-      {/* ====================================================================
-          SCREEN 4: STEP 3 OF 6 - UNIVERSAL TASK SET
-      ==================================================================== */}
       {step === 'tasks' && (
         <div className="flex-1 flex flex-col md:flex-row items-stretch min-h-screen">
-          {/* Left Side: Title, 2 Cards, & Skip Link */}
-          <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-start">
-            {/* Top Navigation & Header */}
-            <div className="flex items-start gap-4 mb-8">
-              <button
-                type="button"
-                onClick={() => setStep('trainings')}
-                className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 mt-1 shadow-2xs"
-                title="Back to trainings"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-
-              <div className="space-y-1">
-                <h1 className="font-sans font-bold text-2xl sm:text-3xl lg:text-4xl text-grey-900 tracking-tight">
-                  You rock! lets setup your universal task set
-                </h1>
-                <p className="text-xs sm:text-sm text-grey-500">
-                  Pick whichever way feels easier — upload a bunch at once, or build them out yourself as you go.
-                </p>
-              </div>
-            </div>
-
-            {/* 2 Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 max-w-4xl">
-              {/* Card 1: Got a lot to add? */}
-              <div className="p-6 sm:p-7 rounded-3xl border border-grey-200/90 bg-white hover:border-grey-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
-                <div>
-                  <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
-                    Got a lot to add?
-                  </h3>
-                  <p className="text-xs sm:text-[13px] text-grey-500 mt-2 leading-relaxed">
-                    Grab our template, fill it in, and upload everything in one go — no need to type each one manually.
-                  </p>
-
-                  <div className="flex items-center gap-2.5 pt-5">
-                    <button
-                      type="button"
-                      onClick={() => setDownloadModal('downloading')}
-                      className="px-4 py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
-                    >
-                      <span>Download template</span>
-                      <Download className="w-3.5 h-3.5" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="px-4 py-2.5 rounded-xl bg-white hover:bg-grey-50 text-grey-800 font-semibold text-xs border border-grey-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                    >
-                      <span>Upload</span>
-                      <Upload className="w-3.5 h-3.5 text-grey-500" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="pt-6 mt-auto">
-                  <img
-                    src={objectiveFolderImg}
-                    alt="Got a lot to add template folder"
-                    className="w-full max-h-48 sm:max-h-52 object-contain object-bottom"
-                  />
-                </div>
-              </div>
-
-              {/* Card 2: Start with our recommended tasks */}
-              <div className="p-6 sm:p-7 rounded-3xl border border-grey-200/90 bg-white hover:border-grey-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
-                <div>
-                  <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
-                    Start with our recommended tasks
-                  </h3>
-                  <p className="text-xs sm:text-[13px] text-grey-500 mt-2 leading-relaxed">
-                    Ready-made tasks you can edit anytime. You can review and customise them at any time.
-                  </p>
-
-                  <div className="pt-5">
-                    <button
-                      type="button"
-                      onClick={() => setStep('behavior')}
-                      className="px-5 py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
-                    >
-                      <span>Use this set</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="pt-6 mt-auto">
-                  <img
-                    src={objectiveBlocksImg}
-                    alt="Recommended tasks lego blocks"
-                    className="w-full max-h-48 sm:max-h-52 object-contain object-bottom"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Skip Link - Located directly beneath cards so it is never lost */}
-            <div className="mt-8 pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setStep('behavior');
-                  toast.info('Skipped Tasks', 'Moved to behavior measurement setup.');
-                }}
-                className="text-xs sm:text-sm font-medium text-grey-500 hover:text-grey-900 underline underline-offset-4 transition-colors cursor-pointer"
-              >
-                Skip for now
-              </button>
-            </div>
-          </div>
-
-          {/* Right Side: Informational Context Panel with Page Numbering Atop */}
-          <div className="w-full md:w-[380px] lg:w-[420px] bg-[#FEF9C3]/80 p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-amber-100/60">
-            <div className="space-y-6 z-10">
-              {/* Page Numbering Atop Explanation Segment */}
-              {renderStepProgressPills(3)}
-
-              <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-sm text-grey-900">
-                    What is a task?
-                  </h4>
-                  <div className="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center text-amber-700">
-                    <FileText className="w-3.5 h-3.5" />
-                  </div>
-                </div>
-                <p className="text-xs text-grey-600 leading-relaxed">
-                  Think of tasks as the measurable actions staff observe during activities. They help track performance and progress consistently across your program.{' '}
+          {taskMode === 'choice' ? (
+            /* CHOICE VIEW */
+            <>
+              <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-start">
+                <div className="flex items-start gap-4 mb-8">
                   <button
                     type="button"
-                    onClick={() => toast.info('About Tasks', 'Universal tasks form the evaluation criteria for daily notes.')}
-                    className="font-semibold text-amber-900 underline hover:text-amber-950 inline cursor-pointer"
+                    onClick={() => { setStep('trainings'); setTrainingMode('choice'); }}
+                    className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 mt-1 shadow-2xs"
+                    title="Back to trainings"
                   >
-                    Learn more
+                    <ChevronLeft className="w-4 h-4" />
                   </button>
-                </p>
-              </div>
 
-              <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-3.5 relative overflow-hidden">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-sm text-grey-900">
-                    A few examples to get you started
-                  </h4>
-                  <div className="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center text-amber-700">
-                    <FileText className="w-3.5 h-3.5" />
+                  <div className="space-y-1">
+                    <h1 className="font-sans font-bold text-2xl sm:text-3xl lg:text-4xl text-grey-900 tracking-tight">
+                      Now, let's set up your Universal Task Set.
+                    </h1>
+                    <p className="text-xs sm:text-sm text-grey-500">
+                      Pick whichever way feels easier — upload a bunch at once, or review and customize our preset tasks.
+                    </p>
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  {[
-                    'Follow Activity Instructions',
-                    'Complete Assigned Work',
-                    'Maintain Engagement',
-                    'Demonstrate Responsibility',
-                    'Manage Materials Properly',
-                  ].map((eg, i) => (
-                    <div
-                      key={i}
-                      className="px-3.5 py-1.5 rounded-xl bg-[#FEFCE8] text-amber-950 text-xs font-semibold border border-amber-200/60"
-                    >
-                      {eg}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 max-w-4xl">
+                  {/* Card 1: Got a lot to add? */}
+                  <div className="p-6 sm:p-7 rounded-3xl border border-grey-200/90 bg-white hover:border-grey-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
+                    <div>
+                      <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
+                        Got a lot to add?
+                      </h3>
+                      <p className="text-xs sm:text-[13px] text-grey-500 mt-2 leading-relaxed">
+                        Grab our template, fill it in, and upload everything in one go — no need to type each one manually.
+                      </p>
+
+                      <div className="flex items-center gap-2.5 pt-5">
+                        <button
+                          type="button"
+                          onClick={() => setDownloadModal('downloading')}
+                          className="px-4 py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                        >
+                          <span>Download template</span>
+                          <Download className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="px-4 py-2.5 rounded-xl bg-white hover:bg-grey-50 text-grey-800 font-semibold text-xs border border-grey-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                        >
+                          <span>Upload</span>
+                          <Upload className="w-3.5 h-3.5 text-grey-500" />
+                        </button>
+                      </div>
                     </div>
-                  ))}
-                </div>
 
-                <div className="pt-3 flex justify-end">
-                  <div className="flex -space-x-2.5 items-center">
-                    <img
-                      src={VERIFIED_CARE_AVATARS[5]}
-                      alt="Staff"
-                      onError={handleImageError}
-                      className="w-8 h-8 rounded-full object-cover border-2 border-white"
-                    />
-                    <img
-                      src={VERIFIED_CARE_AVATARS[4]}
-                      alt="Staff"
-                      onError={handleImageError}
-                      className="w-8 h-8 rounded-full object-cover border-2 border-white z-10"
-                    />
-                    <img
-                      src={VERIFIED_CARE_AVATARS[2]}
-                      alt="Client"
-                      onError={handleImageError}
-                      className="w-8 h-8 rounded-full object-cover border-2 border-white z-20"
-                    />
+                    <div className="pt-6 mt-auto">
+                      <img
+                        src={objectiveFolderImg}
+                        alt="Tasks folder"
+                        className="w-full max-h-48 sm:max-h-52 object-contain object-bottom"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Card 2: Prefer to build it yourself? */}
+                  <div className="p-6 sm:p-7 rounded-3xl border border-grey-200/90 bg-white hover:border-grey-300 shadow-xs transition-all flex flex-col justify-between overflow-hidden">
+                    <div>
+                      <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
+                        Prefer to build it yourself?
+                      </h3>
+                      <p className="text-xs sm:text-[13px] text-grey-500 mt-2 leading-relaxed">
+                        No problem — you can use our standard preset tasks and add or tweak as you like.
+                      </p>
+
+                      <div className="pt-5">
+                        <button
+                          type="button"
+                          onClick={() => setTaskMode('manual')}
+                          className="px-5 py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                        >
+                          <span>Let's go</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="pt-6 mt-auto">
+                      <img
+                        src={objectiveBlocksImg}
+                        alt="Tasks lego blocks"
+                        className="w-full max-h-48 sm:max-h-52 object-contain object-bottom"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="pt-8 text-xs text-amber-900/80 italic text-right z-10 font-medium">
-              After tasks, you'll set up your behaviors.
-            </div>
-          </div>
+                <div className="mt-8 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep('behavior');
+                      toast.info('Skipped Universal Tasks', 'Moved to behavior measurement.');
+                    }}
+                    className="text-xs sm:text-sm font-medium text-grey-500 hover:text-grey-900 underline underline-offset-4 transition-colors cursor-pointer"
+                  >
+                    Skip for now
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Side Panel */}
+              <div className="w-full md:w-[380px] lg:w-[420px] bg-[#EDE7FE] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-purple-100">
+                {renderPanelRibbon('text-purple-400')}
+                <div className="space-y-6 z-10">
+                  {renderStepProgressPills(3)}
+                  <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">What are universal tasks?</h4>
+                      <div className="w-6 h-6 rounded-md bg-purple-100 flex items-center justify-center text-purple-700">
+                        <FileText className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+                    <p className="text-xs text-grey-600 leading-relaxed">
+                      Tasks are concrete observable steps evaluated during shifts. They carry standard prompt levels across all programs.{' '}
+                      <button
+                        type="button"
+                        onClick={() => toast.info('About Tasks', 'Universal tasks form the evaluation criteria in daily notes.')}
+                        className="font-semibold text-brand-800 underline hover:text-brand-950 inline cursor-pointer"
+                      >
+                        Learn more
+                      </button>
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-3.5 relative overflow-hidden">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">Standard task domains</h4>
+                      <div className="w-6 h-6 rounded-md bg-purple-100 flex items-center justify-center text-purple-700">
+                        <FileText className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5">
+                      {['Execution', 'Independence', 'Focus', 'Social', 'Safety', 'Self-Care'].map((tag) => (
+                        <span key={tag} className="px-3 py-1.5 rounded-full text-xs font-medium bg-purple-50 text-purple-900 border border-purple-100">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex -space-x-2 items-center justify-end pt-1">
+                      {VERIFIED_CARE_AVATARS.slice(0, 3).map((av, idx) => (
+                        <img key={idx} src={av} alt="Care avatar" onError={handleImageError} className="w-7 h-7 rounded-full object-cover border-2 border-white shadow-2xs" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-6 text-xs text-grey-500 text-right z-10 font-medium">
+                  After tasks, you'll set up behavior measurement.
+                </div>
+              </div>
+            </>
+          ) : (
+            /* MANUAL TASKS BUILDER (WITH PRESET TASKS AND CUSTOM TASK CREATOR) */
+            <>
+              <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-between overflow-y-auto">
+                <div className="space-y-6 max-w-3xl">
+                  {/* Top-Left Stepper */}
+                  {renderTopLeftStepper(3)}
+
+                  {/* Back button */}
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setTaskMode('choice')}
+                      className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shadow-2xs mb-4"
+                      title="Back to options"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+
+                    <h1 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
+                      Manually fill your universal tasks
+                    </h1>
+                    <p className="text-xs sm:text-sm text-grey-500 mt-1">
+                      Review preset tasks or add custom tasks one by one
+                    </p>
+                  </div>
+
+                  {/* Card for typing custom task */}
+                  <div className="bg-white rounded-2xl border border-grey-200/90 p-5 sm:p-6 shadow-2xs space-y-3.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="sm:col-span-2">
+                        <input
+                          type="text"
+                          value={manualTaskTitle}
+                          onChange={(e) => setManualTaskTitle(e.target.value)}
+                          placeholder="Add a new universal task eg. 'Hygiene & Handwashing'"
+                          className="w-full text-xs sm:text-sm font-semibold text-grey-900 border-0 focus:outline-none placeholder:text-grey-400 placeholder:font-normal py-1"
+                        />
+                      </div>
+                      <div>
+                        <select
+                          value={manualTaskCategory}
+                          onChange={(e) => setManualTaskCategory(e.target.value)}
+                          className="w-full px-3 py-1.5 rounded-lg border border-grey-200 bg-grey-50 text-xs font-semibold text-grey-800 focus:outline-none cursor-pointer"
+                        >
+                          <option value="Execution">Execution</option>
+                          <option value="Independence">Independence</option>
+                          <option value="Focus">Focus</option>
+                          <option value="Social">Social</option>
+                          <option value="Safety">Safety</option>
+                          <option value="Self-Care">Self-Care</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <input
+                      type="text"
+                      value={manualTaskDesc}
+                      onChange={(e) => setManualTaskDesc(e.target.value)}
+                      placeholder="Add task prompt level or behavioral criteria..."
+                      className="w-full text-xs text-grey-700 border-0 focus:outline-none placeholder:text-grey-400 py-1"
+                    />
+
+                    <div className="flex justify-end pt-2 border-t border-grey-100">
+                      <button
+                        type="button"
+                        onClick={handleAddTask}
+                        className={cn(
+                          "px-5 py-2.5 rounded-full text-xs font-semibold text-white transition-all cursor-pointer shadow-xs",
+                          manualTaskTitle.trim() ? "bg-[#0A0A0A] hover:bg-neutral-800" : "bg-[#8E9093] hover:bg-grey-700"
+                        )}
+                      >
+                        Add task
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Preset & Custom Tasks List */}
+                  <div className="space-y-3 pt-2">
+                    <div className="text-xs font-bold text-grey-500 uppercase tracking-wider">
+                      Universal Task Set ({tasksList.filter(t => t.enabled).length} Active)
+                    </div>
+                    <div className="space-y-2.5">
+                      {tasksList.map((t) => (
+                        <div
+                          key={t.id}
+                          className="p-4 rounded-xl border border-grey-200 bg-white shadow-2xs flex items-center justify-between gap-3 group"
+                        >
+                          <div className="space-y-1 min-w-0">
+                            <div className="font-bold text-xs sm:text-sm text-grey-900 flex items-center gap-2">
+                              <span className="font-mono text-grey-400 text-xs">{t.id}</span>
+                              <span className="truncate">{t.name}</span>
+                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-purple-50 text-purple-800 border border-purple-100 shrink-0">
+                                {t.category}
+                              </span>
+                            </div>
+                            <p className="text-xs text-grey-600 truncate">
+                              {t.desc}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-3 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setTasksList((prev) =>
+                                  prev.map((item) => (item.id === t.id ? { ...item, enabled: !item.enabled } : item))
+                                );
+                              }}
+                              className={cn(
+                                "w-9 h-5 rounded-full flex items-center px-0.5 transition-colors cursor-pointer",
+                                t.enabled ? "bg-[#2ee05a] justify-end" : "bg-grey-300 justify-start"
+                              )}
+                              title={t.enabled ? "Disable task" : "Enable task"}
+                            >
+                              <div className="w-4 h-4 rounded-full bg-white shadow-xs" />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setTasksList((prev) => prev.filter((item) => item.id !== t.id));
+                                toast.info('Task Removed', `Removed "${t.name}".`);
+                              }}
+                              className="text-grey-400 hover:text-red-500 transition-colors p-1"
+                              title="Delete task"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Actions */}
+                <div className="pt-8 border-t border-grey-100 flex items-center justify-between mt-8">
+                  <button
+                    type="button"
+                    onClick={() => setTaskMode('choice')}
+                    className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-700 transition-colors cursor-pointer"
+                  >
+                    Back to choices
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep('behavior');
+                      toast.success('Tasks Saved', 'Moving to behavior measurement.');
+                    }}
+                    className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
+                  >
+                    <span>Continue to behavior measurement</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Side Panel */}
+              <div className="w-full md:w-[380px] lg:w-[420px] bg-[#EDE7FE] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-purple-100">
+                {renderPanelRibbon('text-purple-400')}
+                <button
+                  type="button"
+                  onClick={onReturnToDashboard}
+                  className="absolute top-6 right-6 w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-grey-600 hover:text-grey-900 transition-colors cursor-pointer z-20"
+                  title="Close and return to dashboard"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+
+                <div className="space-y-6 z-10 pt-4">
+                  <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">What are universal tasks?</h4>
+                      <div className="w-6 h-6 rounded-md bg-purple-100 flex items-center justify-center text-purple-700">
+                        <FileText className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+                    <p className="text-xs text-grey-600 leading-relaxed">
+                      Tasks are concrete observable steps evaluated during shifts. They carry standard prompt levels across all programs.{' '}
+                      <button
+                        type="button"
+                        onClick={() => toast.info('About Tasks', 'Universal tasks form the evaluation criteria in daily notes.')}
+                        className="font-semibold text-brand-800 underline hover:text-brand-950 inline cursor-pointer"
+                      >
+                        Learn more
+                      </button>
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-3.5 relative overflow-hidden">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">Task prompt levels</h4>
+                      <div className="w-6 h-6 rounded-md bg-purple-100 flex items-center justify-center text-purple-700">
+                        <FileText className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5">
+                      {['Verbal prompt', 'Visual cue', 'Gestural', 'Physical assist', 'Independent'].map((tag) => (
+                        <span key={tag} className="px-3 py-1.5 rounded-full text-xs font-medium bg-purple-50 text-purple-900 border border-purple-100">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex -space-x-2 items-center justify-end pt-1">
+                      {VERIFIED_CARE_AVATARS.slice(0, 3).map((av, idx) => (
+                        <img key={idx} src={av} alt="Care avatar" onError={handleImageError} className="w-7 h-7 rounded-full object-cover border-2 border-white shadow-2xs" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-6 text-xs text-grey-500 text-right z-10 font-medium">
+                  After tasks, you'll set up behavior measurement.
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
 
-      {/* ====================================================================
-          SCREEN 5: STEP 4 OF 6 - BEHAVIOR MEASUREMENT (media_1793886090218_4fbc4601.png)
-      ==================================================================== */}
-      {step === 'behavior' && (
+{step === 'behavior' && (
         <div className="flex-1 flex flex-col md:flex-row items-stretch min-h-screen">
           {/* Left Side: Title, 2 Cards with Official Illustrations, & Bottom Actions */}
           <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-between">
@@ -1476,9 +2217,9 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
           (Matches media_1793813970862_b9f15d5e.png & media_1793812396350_09b3df34.jpg)
       ==================================================================== */}
       {step === 'calendar' && (
-        <div className="flex-1 flex flex-col min-h-screen overflow-y-auto">
+        <div className="h-screen max-h-screen flex flex-col overflow-hidden bg-[#F8F9FA]">
           {/* Top Title Bar with Page Numbering on Right */}
-          <div className="p-6 sm:p-8 lg:px-12 border-b border-grey-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white sticky top-0 z-30 shadow-2xs">
+          <div className="p-6 sm:p-8 lg:px-12 border-b border-grey-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white shrink-0 z-30 shadow-2xs">
             <div className="flex items-start gap-4">
               <button
                 type="button"
@@ -1539,7 +2280,7 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col lg:flex-row items-stretch pb-24 min-h-0">
+          <div className="flex-1 flex flex-col lg:flex-row items-stretch overflow-hidden min-h-0">
             {/* ========================================================
                 LEFT COLUMN: FORMS WHERE YOU TOGGLE AND UNTOGGLE STUFFS
                 (Captures all 8 toggles from media_1793813970862_b9f15d5e.png)
@@ -2095,35 +2836,76 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
           SCREEN 7: STEP 6 OF 6 - DAILY NOTES WITH RESPONSIVE SECTIONED PHONE PREVIEW
           (Exact Match to media_1793886282923_c7b77254.png)
       ==================================================================== */}
-      {step === 'daily-note' && (
-        <div className="flex-1 flex flex-col min-h-screen bg-white">
-          {/* Top Title Bar */}
-          <div className="p-6 sm:p-8 lg:px-12 border-b border-grey-100 flex items-center justify-between gap-4 bg-white">
-            <div className="flex items-center gap-3">
+            {step === 'daily-note' && (
+        <div className="h-screen max-h-screen flex flex-col overflow-hidden bg-white">
+          {/* Top Title Bar - Fixed and Non-scrollable */}
+          <div className="shrink-0 p-5 sm:p-6 lg:px-10 border-b border-grey-100 flex items-center justify-between gap-4 bg-white z-20">
+            <div className="flex items-start gap-4">
               <button
                 type="button"
                 onClick={() => setStep('calendar')}
-                className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 shadow-2xs"
+                className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 mt-0.5 shadow-2xs"
                 title="Back to calendar"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
 
-              <h1 className="font-sans font-bold text-2xl sm:text-3xl lg:text-4xl text-grey-900 tracking-tight">
-                Daily notes
-              </h1>
+              <div className="space-y-1">
+                <h1 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
+                  Daily notes
+                </h1>
+                <p className="text-xs sm:text-sm text-grey-500">
+                  Configure note sections and parameters. Test with the interactive staff preview beside you.
+                </p>
+              </div>
             </div>
 
-            {/* Step Progress Numbering */}
-            {renderStepProgressPills(6)}
+            {/* Stepper on Far Right */}
+            <div className="shrink-0 flex items-center gap-1.5 sm:gap-2">
+              {[1, 2, 3, 4, 5, 6].map((num) => {
+                const isCurrent = 6 === num;
+                const isPast = 6 > num;
+                return (
+                  <button
+                    key={num}
+                    type="button"
+                    onClick={() => {
+                      const stepMap: Record<number, CurriculumStep> = {
+                        1: 'objectives',
+                        2: 'trainings',
+                        3: 'tasks',
+                        4: 'behavior',
+                        5: 'calendar',
+                        6: 'daily-note',
+                      };
+                      if (stepMap[num]) setStep(stepMap[num]);
+                    }}
+                    className={cn(
+                      'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer',
+                      isCurrent
+                        ? 'bg-[#0A0A0A] text-white shadow-xs ring-2 ring-black/15 scale-105'
+                        : isPast
+                        ? 'bg-grey-200 text-grey-800 hover:bg-grey-300'
+                        : 'bg-grey-100 text-grey-400 hover:bg-grey-200'
+                    )}
+                    title={`Go to Step ${num}`}
+                  >
+                    {num}
+                  </button>
+                );
+              })}
+              <span className="text-[11px] font-bold text-grey-600 uppercase tracking-wider ml-2">
+                Step 6 of 6
+              </span>
+            </div>
           </div>
 
-          <div className="flex-1 flex flex-col lg:flex-row items-stretch min-h-0">
+          <div className="flex-1 flex flex-col lg:flex-row items-stretch overflow-hidden min-h-0">
             {/* ========================================================
                 LEFT COLUMN: 4 HORIZONTAL PILL TABS & CONFIGURATION FORM
-                (Exact Match to media_1793886282923_c7b77254.png)
+                (Generous width, perfectly unsqueezed layout)
             ======================================================== */}
-            <div className="flex-1 p-6 sm:p-8 lg:p-10 flex flex-col justify-between max-w-3xl overflow-y-auto">
+            <div className="flex-1 min-w-0 p-6 sm:p-8 lg:p-10 flex flex-col justify-between overflow-y-auto">
               <div className="space-y-6">
                 {/* 4 Horizontal Pill Tabs */}
                 <div className="flex flex-wrap items-center gap-1.5 pt-1 pb-2">
@@ -2164,7 +2946,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                       </p>
                     </div>
 
-                    {/* Section 1 Card */}
                     <div className="bg-white rounded-3xl border border-grey-200/90 p-6 sm:p-7 shadow-2xs space-y-5">
                       {/* Show UCI number Toggle */}
                       <div className="flex items-center justify-between pb-4 border-b border-grey-100">
@@ -2252,7 +3033,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     </div>
 
                     <div className="bg-white rounded-3xl border border-grey-200/90 p-6 sm:p-7 shadow-2xs space-y-4">
-                      {/* Question 1 */}
                       <div className="p-4 rounded-2xl border border-grey-100 bg-grey-50/40 flex items-center justify-between gap-4">
                         <div>
                           <div className="font-bold text-xs sm:text-sm text-grey-900">Did the client participate?</div>
@@ -2263,7 +3043,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                         </div>
                       </div>
 
-                      {/* Question 2 */}
                       <div className="p-4 rounded-2xl border border-grey-100 bg-grey-50/40 flex items-center justify-between gap-4">
                         <div>
                           <div className="font-bold text-xs sm:text-sm text-grey-900">Were scheduled training activities completed?</div>
@@ -2274,7 +3053,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                         </div>
                       </div>
 
-                      {/* Question 3 */}
                       <div className="p-4 rounded-2xl border border-grey-100 bg-grey-50/40 flex items-center justify-between gap-4">
                         <div>
                           <div className="font-bold text-xs sm:text-sm text-grey-900">Were any behavioral redirections required?</div>
@@ -2381,8 +3159,8 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                 )}
               </div>
 
-              {/* Bottom Actions matching media_1793886282923_c7b77254.png */}
-              <div className="pt-8 border-t border-grey-100 flex items-center justify-between">
+              {/* Bottom Actions */}
+              <div className="pt-8 border-t border-grey-100 flex items-center justify-between mt-8">
                 <button
                   type="button"
                   onClick={() => {
@@ -2422,10 +3200,10 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
             </div>
 
             {/* ========================================================
-                RIGHT COLUMN: SUPPORTING GREY PREVIEW AREA WITH PHONE MOCKUP
-                (Exact Match to media_1793886282923_c7b77254.png)
+                RIGHT COLUMN: SUPPORTING GREY PREVIEW AREA WITH REAL IPHONE MOCKUP
+                (Pushed flush to right, no chaotic centering, real iPhone frame)
             ======================================================== */}
-            <div className="w-full lg:w-[390px] xl:w-[430px] bg-[#EEF0F3] p-5 lg:p-7 border-l border-grey-200/90 flex flex-col justify-start shrink-0 select-none">
+            <div className="w-[390px] lg:w-[430px] xl:w-[460px] bg-[#EEF0F3] p-5 lg:p-6 border-l border-grey-200/90 flex flex-col justify-start shrink-0 select-none overflow-y-auto">
               <div className="space-y-3.5 max-w-[320px] mx-auto w-full">
                 {/* Header above phone */}
                 <div className="flex items-start justify-between">
@@ -2452,263 +3230,262 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                   </button>
                 </div>
 
-                {/* Hyper-Realistic Smartphone Chassis that fits completely in view */}
-                <div className="w-full bg-[#1C1C1E] rounded-[42px] p-2.5 shadow-2xl border-4 border-grey-900 ring-1 ring-black/20 relative select-none">
-                  {/* Dynamic Island Pill */}
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 w-18 h-3.5 bg-black rounded-full z-20 flex items-center justify-end px-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-950/80 border border-indigo-900" />
-                  </div>
-
-                  {/* Inside Screen Canvas (Displays ONLY questions for the active section) */}
-                  <div className="w-full bg-white rounded-[34px] overflow-hidden pt-6 pb-3 px-3.5 max-h-[510px] overflow-y-auto space-y-2.5 text-left text-xs font-sans">
-                    {/* Status Bar */}
-                    <div className="flex items-center justify-between text-[10px] font-bold text-grey-900 px-1 pt-0.5">
-                      <span>9:41</span>
-                      <div className="flex items-center gap-1 text-grey-700">
-                        <span className="text-[8px] font-bold">5G</span>
-                        <div className="w-3.5 h-2 rounded-xs border border-grey-800 flex items-center p-0.5">
-                          <div className="w-full h-full bg-grey-900 rounded-2xs" />
+                {/* PHOTOREALISTIC IPHONE FRAME MOCKUP (Using public/iphone-frame.png) */}
+                <div className="relative w-[280px] sm:w-[305px] aspect-[583/1024] select-none mx-auto drop-shadow-xl mt-1">
+                  {/* Inside Screen Canvas underneath the bezel */}
+                  <div className="absolute left-[21.27%] top-[15.82%] w-[57.63%] h-[68.46%] rounded-[24px] sm:rounded-[26px] overflow-hidden bg-white text-grey-900 z-10 flex flex-col">
+                    <div className="w-full h-full overflow-y-auto px-3 pt-6 pb-3 space-y-2.5 text-left text-xs font-sans">
+                      {/* Phone Status Bar */}
+                      <div className="flex items-center justify-between text-[9px] font-bold text-grey-900 px-1 pt-0.5">
+                        <span>9:41</span>
+                        <div className="flex items-center gap-1 text-grey-700">
+                          <span className="text-[8px] font-bold">5G</span>
+                          <div className="w-3.5 h-2 rounded-xs border border-grey-800 flex items-center p-0.5">
+                            <div className="w-full h-full bg-grey-900 rounded-2xs" />
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* App Header Inside Phone */}
-                    <div className="pt-1 border-b border-grey-100 pb-1.5">
-                      <div className="font-bold text-sm text-grey-900 leading-tight">Daily Note</div>
-                      <div className="text-[10px] text-grey-500">Joe Doe · October 5, 2026</div>
-                    </div>
+                      {/* Daily note title */}
+                      <div className="pt-0.5 border-b border-grey-100 pb-1">
+                        <div className="font-bold text-xs text-grey-900 leading-tight">Daily Note</div>
+                        <div className="text-[9px] text-grey-500">Joe Doe · October 5, 2026</div>
+                      </div>
 
-                    {/* Active Section Pill Tag */}
-                    <div className="pt-0.5">
-                      <span className="inline-block px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[9px] font-bold uppercase tracking-wider border border-emerald-200">
+                      {/* Active Section Tag */}
+                      <div>
+                        <span className="inline-block px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[8px] font-bold uppercase tracking-wider border border-emerald-200">
+                          {activeNoteSection === 1 && 'CLIENT INFORMATION & ATTENDANCE'}
+                          {activeNoteSection === 2 && 'PROVIDER QUESTIONS'}
+                          {activeNoteSection === 3 && 'ACTIVITY & PROGRESS'}
+                          {activeNoteSection === 4 && 'DAILY NOTE'}
+                        </span>
+                      </div>
+
+                      <div className="font-bold text-xs text-grey-900">
                         {activeNoteSection === 1 && 'Client Information & Attendance'}
                         {activeNoteSection === 2 && 'Provider Questions'}
                         {activeNoteSection === 3 && 'Activity & Progress'}
                         {activeNoteSection === 4 && 'Daily Note'}
-                      </span>
-                    </div>
+                      </div>
 
-                    <div className="font-bold text-xs text-grey-900 pt-0.5">
-                      {activeNoteSection === 1 && 'Client Information & Attendance'}
-                      {activeNoteSection === 2 && 'Provider Questions'}
-                      {activeNoteSection === 3 && 'Activity & Progress'}
-                      {activeNoteSection === 4 && 'Daily Note'}
-                    </div>
-
-                    {/* ===================================================
-                        ONLY SHOW ACTIVE SECTION QUESTIONS / FIELDS
-                    =================================================== */}
-
-                    {/* SECTION 1: Client Info & Attendance */}
-                    {activeNoteSection === 1 && (
-                      <div className="space-y-2 animate-in fade-in duration-150">
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="space-y-1">
-                            <span className="text-grey-500 block text-[9px]">Client</span>
-                            <div className="px-2.5 py-1.5 rounded-lg border border-grey-200 bg-white text-[11px] font-medium text-grey-900">
-                              Joe Doe
-                            </div>
-                          </div>
-                          <div className="space-y-1">
-                            <span className="text-grey-500 block text-[9px]">Date</span>
-                            <div className="px-2.5 py-1.5 rounded-lg border border-grey-200 bg-white text-[11px] font-medium text-grey-900">
-                              October 5, 2026
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-2">
-                          {showUci && (
+                      {/* SECTION 1: Client Info & Attendance */}
+                      {activeNoteSection === 1 && (
+                        <div className="space-y-2 animate-in fade-in duration-150">
+                          <div className="grid grid-cols-2 gap-2">
                             <div className="space-y-1">
-                              <span className="text-grey-500 block text-[9px]">UCI number</span>
-                              <div className="px-2.5 py-1.5 rounded-lg border border-grey-200 bg-white text-[11px] font-mono text-grey-900">
-                                1234567
+                              <span className="text-grey-500 block text-[9px]">Client</span>
+                              <div className="px-2 py-1.5 rounded-lg border border-grey-200 bg-white text-[10px] font-medium text-grey-900 truncate">
+                                Joe Doe
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              <span className="text-grey-500 block text-[9px]">Date</span>
+                              <div className="px-2 py-1.5 rounded-lg border border-grey-200 bg-white text-[10px] font-medium text-grey-900 truncate">
+                                Oct 5, 2026
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2">
+                            {showUci && (
+                              <div className="space-y-1">
+                                <span className="text-grey-500 block text-[9px]">UCI number</span>
+                                <div className="px-2 py-1.5 rounded-lg border border-grey-200 bg-white text-[10px] font-mono text-grey-900 truncate">
+                                  1234567
+                                </div>
+                              </div>
+                            )}
+                            <div className={cn('space-y-1', !showUci && 'col-span-2')}>
+                              <span className="text-grey-500 block text-[9px]">Assigned Staff</span>
+                              <div className="px-2 py-1.5 rounded-lg border border-grey-200 bg-white text-[10px] font-medium text-grey-900 truncate">
+                                Reuben Stewart
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <span className="text-grey-500 block text-[9px]">Scheduled hours · From calendar</span>
+                            <div className="px-2 py-1.5 rounded-lg border border-grey-200 bg-white text-[10px] font-medium text-grey-900">
+                              3 hours · 9AM–12PM
+                            </div>
+                          </div>
+
+                          <div className="space-y-1 pt-0.5">
+                            <span className="text-grey-700 block text-[9px] font-semibold">Attendance *</span>
+                            <select
+                              value={phoneAttendance}
+                              onChange={(e) => setPhoneAttendance(e.target.value as 'Present' | 'Absent')}
+                              className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                            >
+                              <option value="Present">Present</option>
+                              <option value="Absent">Absent</option>
+                            </select>
+                          </div>
+
+                          {phoneAttendance === 'Absent' && (
+                            <div className="space-y-1.5 pt-0.5 animate-in fade-in duration-150">
+                              <div className="space-y-1">
+                                <span className="text-grey-700 block text-[9px] font-semibold">Absence reason *</span>
+                                <select
+                                  value={phoneAbsenceReason}
+                                  onChange={(e) => setPhoneAbsenceReason(e.target.value)}
+                                  className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                                >
+                                  <option value="Illness">Illness</option>
+                                  <option value="Medical Appointment">Medical Appointment</option>
+                                  <option value="Family Leave">Family Leave</option>
+                                  <option value="Transportation Delay">Transportation Delay</option>
+                                </select>
+                              </div>
+
+                              <div className="p-2 rounded-xl bg-[#E8F8E5] border border-[#C5EEC0] text-[9px] text-[#22681E] font-medium leading-relaxed">
+                                Only the absence reason is recorded.
                               </div>
                             </div>
                           )}
-                          <div className={cn('space-y-1', !showUci && 'col-span-2')}>
-                            <span className="text-grey-500 block text-[9px]">Assigned Staff</span>
-                            <div className="px-2.5 py-1.5 rounded-lg border border-grey-200 bg-white text-[11px] font-medium text-grey-900">
-                              Reuben Stewart
+                        </div>
+                      )}
+
+                      {/* SECTION 2: Provider Questions */}
+                      {activeNoteSection === 2 && (
+                        <div className="space-y-2.5 animate-in fade-in duration-150">
+                          <div className="space-y-1">
+                            <span className="text-grey-700 block text-[10px] font-medium">
+                              Did the client participate? *
+                            </span>
+                            <select
+                              value={phoneParticipated}
+                              onChange={(e) => setPhoneParticipated(e.target.value)}
+                              className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                            >
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
+                            </select>
+                          </div>
+
+                          <div className="space-y-1">
+                            <span className="text-grey-700 block text-[10px] font-medium">
+                              Were scheduled activities completed? *
+                            </span>
+                            <select
+                              value={phoneGoalsMet}
+                              onChange={(e) => setPhoneGoalsMet(e.target.value)}
+                              className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                            >
+                              <option value="Yes">Yes</option>
+                              <option value="Partial">Partial</option>
+                              <option value="No">No</option>
+                            </select>
+                          </div>
+
+                          <div className="space-y-1">
+                            <span className="text-grey-700 block text-[10px] font-medium">
+                              Any behavioral redirections required?
+                            </span>
+                            <select
+                              defaultValue="No"
+                              className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                            >
+                              <option value="No">No</option>
+                              <option value="Yes - Logged">Yes - Logged</option>
+                            </select>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* SECTION 3: Activity & Progress */}
+                      {activeNoteSection === 3 && (
+                        <div className="space-y-2.5 animate-in fade-in duration-150">
+                          <div className="space-y-1">
+                            <span className="text-grey-700 block text-[10px] font-medium">
+                              Did the client follow the calendar?
+                            </span>
+                            <select
+                              defaultValue="Yes"
+                              className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                            >
+                              <option value="Yes">Yes</option>
+                              <option value="No">No</option>
+                            </select>
+                          </div>
+
+                          <div className="space-y-1">
+                            <span className="text-grey-700 block text-[10px] font-medium">
+                              ISP Objective: Independent Daily Living
+                            </span>
+                            <div className="px-2 py-1.5 rounded-lg border border-grey-200 bg-grey-50 text-[9px] text-grey-800 font-semibold flex items-center justify-between">
+                              <span>Goal progress</span>
+                              <span className="text-emerald-700 font-bold">On Track (85%)</span>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="space-y-1">
-                          <span className="text-grey-500 block text-[9px]">Scheduled hours · From calendar</span>
-                          <div className="px-2.5 py-1.5 rounded-lg border border-grey-200 bg-white text-[11px] font-medium text-grey-900">
-                            3 hours · 9AM–12PM
+                          <div className="space-y-1">
+                            <span className="text-grey-700 block text-[10px] font-medium">
+                              Staff prompt level required
+                            </span>
+                            <select
+                              value={phonePromptLevel}
+                              onChange={(e) => setPhonePromptLevel(e.target.value)}
+                              className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                            >
+                              <option value="Verbal">Verbal prompt</option>
+                              <option value="Visual">Visual cue</option>
+                              <option value="Gestural">Gestural</option>
+                              <option value="Independent">Independent</option>
+                            </select>
                           </div>
                         </div>
+                      )}
 
-                        <div className="space-y-1 pt-0.5">
-                          <span className="text-grey-700 block text-[10px] font-semibold">Attendance *</span>
-                          <select
-                            value={phoneAttendance}
-                            onChange={(e) => setPhoneAttendance(e.target.value as 'Present' | 'Absent')}
-                            className="w-full px-2.5 py-1.5 rounded-lg border border-grey-300 bg-white text-xs font-semibold text-grey-900 focus:outline-none cursor-pointer"
-                          >
-                            <option value="Present">Present</option>
-                            <option value="Absent">Absent</option>
-                          </select>
-                        </div>
-
-                        {phoneAttendance === 'Absent' && (
-                          <div className="space-y-2 pt-0.5 animate-in fade-in duration-150">
-                            <div className="space-y-1">
-                              <span className="text-grey-700 block text-[10px] font-semibold">Absence reason *</span>
-                              <select
-                                value={phoneAbsenceReason}
-                                onChange={(e) => setPhoneAbsenceReason(e.target.value)}
-                                className="w-full px-2.5 py-1.5 rounded-lg border border-grey-300 bg-white text-xs font-semibold text-grey-900 focus:outline-none cursor-pointer"
-                              >
-                                <option value="Illness">Illness</option>
-                                <option value="Medical Appointment">Medical Appointment</option>
-                                <option value="Family Leave">Family Leave</option>
-                                <option value="Transportation Delay">Transportation Delay</option>
-                              </select>
-                            </div>
-
-                            {/* Green Notification Callout matching screenshot */}
-                            <div className="p-2.5 rounded-xl bg-[#E8F8E5] border border-[#C5EEC0] text-[10px] text-[#22681E] font-medium leading-relaxed">
-                              Only the absence reason is recorded.
-                            </div>
+                      {/* SECTION 4: Daily Note */}
+                      {activeNoteSection === 4 && (
+                        <div className="space-y-2.5 animate-in fade-in duration-150">
+                          <div className="space-y-1">
+                            <span className="text-grey-700 block text-[10px] font-medium">
+                              Daily Summary Note *
+                            </span>
+                            <textarea
+                              rows={2}
+                              defaultValue="Client participated enthusiastically in morning meal prep and afternoon art workshop. Demonstrated active self-care skills."
+                              className="w-full p-2 rounded-xl border border-grey-300 bg-grey-50 text-[9px] text-grey-900 focus:outline-none resize-none leading-relaxed"
+                            />
                           </div>
-                        )}
-                      </div>
-                    )}
 
-                    {/* SECTION 2: Provider Questions */}
-                    {activeNoteSection === 2 && (
-                      <div className="space-y-3 animate-in fade-in duration-150">
-                        <div className="space-y-1">
-                          <span className="text-grey-700 block text-[11px] font-medium">
-                            Did the client participate? *
-                          </span>
-                          <select
-                            value={phoneParticipated}
-                            onChange={(e) => setPhoneParticipated(e.target.value)}
-                            className="w-full px-2.5 py-1.5 rounded-lg border border-grey-300 bg-white text-xs font-semibold text-grey-900 focus:outline-none cursor-pointer"
-                          >
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                          </select>
-                        </div>
-
-                        <div className="space-y-1">
-                          <span className="text-grey-700 block text-[11px] font-medium">
-                            Were scheduled activities completed? *
-                          </span>
-                          <select
-                            value={phoneGoalsMet}
-                            onChange={(e) => setPhoneGoalsMet(e.target.value)}
-                            className="w-full px-2.5 py-1.5 rounded-lg border border-grey-300 bg-white text-xs font-semibold text-grey-900 focus:outline-none cursor-pointer"
-                          >
-                            <option value="Yes">Yes</option>
-                            <option value="Partial">Partial</option>
-                            <option value="No">No</option>
-                          </select>
-                        </div>
-
-                        <div className="space-y-1">
-                          <span className="text-grey-700 block text-[11px] font-medium">
-                            Any behavioral redirections required?
-                          </span>
-                          <select
-                            defaultValue="No"
-                            className="w-full px-2.5 py-1.5 rounded-lg border border-grey-300 bg-white text-xs font-semibold text-grey-900 focus:outline-none cursor-pointer"
-                          >
-                            <option value="No">No</option>
-                            <option value="Yes - Logged">Yes - Logged</option>
-                          </select>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* SECTION 3: Activity & Progress */}
-                    {activeNoteSection === 3 && (
-                      <div className="space-y-3 animate-in fade-in duration-150">
-                        <div className="space-y-1">
-                          <span className="text-grey-700 block text-[11px] font-medium">
-                            Did the client follow the calendar?
-                          </span>
-                          <select
-                            defaultValue="Yes"
-                            className="w-full px-2.5 py-1.5 rounded-lg border border-grey-300 bg-white text-xs font-semibold text-grey-900 focus:outline-none cursor-pointer"
-                          >
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                          </select>
-                        </div>
-
-                        <div className="space-y-1">
-                          <span className="text-grey-700 block text-[11px] font-medium">
-                            ISP Objective: Independent Daily Living
-                          </span>
-                          <div className="px-2.5 py-1.5 rounded-lg border border-grey-200 bg-grey-50 text-[10px] text-grey-800 font-semibold flex items-center justify-between">
-                            <span>Goal progress</span>
-                            <span className="text-emerald-700 font-bold">On Track (85%)</span>
-                          </div>
-                        </div>
-
-                        <div className="space-y-1">
-                          <span className="text-grey-700 block text-[11px] font-medium">
-                            Staff prompt level required
-                          </span>
-                          <select
-                            value={phonePromptLevel}
-                            onChange={(e) => setPhonePromptLevel(e.target.value)}
-                            className="w-full px-2.5 py-1.5 rounded-lg border border-grey-300 bg-white text-xs font-semibold text-grey-900 focus:outline-none cursor-pointer"
-                          >
-                            <option value="Verbal">Verbal prompt</option>
-                            <option value="Visual">Visual cue</option>
-                            <option value="Gestural">Gestural</option>
-                            <option value="Independent">Independent</option>
-                          </select>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* SECTION 4: Daily Note */}
-                    {activeNoteSection === 4 && (
-                      <div className="space-y-3 animate-in fade-in duration-150">
-                        <div className="space-y-1">
-                          <span className="text-grey-700 block text-[11px] font-medium">
-                            Daily Summary Note *
-                          </span>
-                          <textarea
-                            rows={3}
-                            defaultValue="Client participated enthusiastically in morning meal prep and afternoon art workshop. Demonstrated active self-care skills."
-                            className="w-full p-2.5 rounded-xl border border-grey-300 bg-grey-50 text-[10px] text-grey-900 focus:outline-none resize-none leading-relaxed"
-                          />
-                        </div>
-
-                        <div className="space-y-1">
-                          <span className="text-grey-700 block text-[11px] font-medium">
-                            Staff Electronic Signature *
-                          </span>
-                          <div className="p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/50 flex items-center justify-between">
-                            <div>
-                              <div className="text-[11px] font-bold text-emerald-950 font-sans italic tracking-wide">
-                                Reuben Stewart
+                          <div className="space-y-1">
+                            <span className="text-grey-700 block text-[10px] font-medium">
+                              Staff Electronic Signature *
+                            </span>
+                            <div className="p-2 rounded-xl border border-emerald-200 bg-emerald-50/50 flex items-center justify-between">
+                              <div>
+                                <div className="text-[10px] font-bold text-emerald-950 font-sans italic tracking-wide">
+                                  Reuben Stewart
+                                </div>
+                                <div className="text-[8px] text-emerald-800">
+                                  Verified Oct 5, 2026 · 12:02 PM
+                                </div>
                               </div>
-                              <div className="text-[9px] text-emerald-800">
-                                Verified Oct 5, 2026 · 12:02 PM
-                              </div>
+                              <Check className="w-3.5 h-3.5 text-emerald-700" />
                             </div>
-                            <Check className="w-4 h-4 text-emerald-700" />
                           </div>
-                        </div>
 
-                        <button
-                          type="button"
-                          className="w-full py-2 rounded-xl bg-[#0A0A0A] text-white font-bold text-[11px] mt-1 shadow-xs"
-                        >
-                          Submit Daily Note
-                        </button>
-                      </div>
-                    )}
+                          <button
+                            type="button"
+                            className="w-full py-1.5 rounded-xl bg-[#0A0A0A] text-white font-bold text-[10px] mt-1 shadow-xs"
+                          >
+                            Submit Daily Note
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
+
+                  {/* REAL IPHONE FRAME OVERLAY (From user-uploaded media_1794072213988_59c1e525.png) */}
+                  <img
+                    src="/iphone-frame.png"
+                    alt="iPhone Frame"
+                    className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none z-20"
+                  />
                 </div>
               </div>
             </div>
@@ -2716,10 +3493,7 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
         </div>
       )}
 
-      {/* ====================================================================
-          POPUP 1: YOUR TEMPLATE DOWNLOADING!
-      ==================================================================== */}
-      {downloadModal === 'downloading' && (
+{downloadModal === 'downloading' && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
           <div className="w-full max-w-sm bg-white rounded-3xl p-6 sm:p-7 text-center shadow-2xl border border-grey-100 flex flex-col items-center select-none animate-in zoom-in-95 duration-200">
             <div className="mb-3">
