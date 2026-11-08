@@ -79,13 +79,13 @@ class SoundManager {
       const b = a.createBuffer(1, len, a.sampleRate);
       const ch = b.getChannelData(0);
       for (let i = 0; i < len; i++) {
-        ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+        ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2);
       }
       const s = a.createBufferSource();
       const f = a.createBiquadFilter();
       const v = a.createGain();
       s.buffer = b;
-      f.type = 'lowpass';
+      f.type = 'bandpass';
       f.frequency.value = freq;
       v.gain.value = gain;
       s.connect(f).connect(v).connect(a.destination);
@@ -96,30 +96,41 @@ class SoundManager {
   }
 
   // Intermediate step sounds are muted so the experience remains focused and professional
-  public tick() {}
+  public tick() {
+    this.tone(880, 0, 0.12, 'sine', 0.08);
+  }
 
   public chime() {}
 
   public step(_level: number = 1) {}
 
-  public snip() {}
+  public snip() {
+    this.noise(0, 0.08, 0.6, 4200);
+    this.noise(0.06, 0.06, 0.5, 3000);
+  }
 
-  public pop(_t: number = 0) {}
+  public pop(t: number = 0) {
+    this.noise(t, 0.18, 0.5, 900);
+    this.noise(t + 0.02, 0.3, 0.25, 2600);
+  }
 
-  // Grand celebration fanfare ONLY played on the final completion page
+  // Grand celebration fanfare played on the final completion page
   public fanfare() {
     const n: [number, number][] = [
       [523, 0],
-      [659, 0.1],
-      [784, 0.2],
-      [1047, 0.3],
-      [784, 0.44],
-      [1047, 0.55],
+      [659, 0.14],
+      [784, 0.28],
+      [1047, 0.42],
+      [784, 0.62],
+      [1047, 0.76],
     ];
     n.forEach(([f, t]) => {
-      this.tone(f, t, 0.35, 'sine', 0.04);
+      this.tone(f, t, 0.5, 'sawtooth', 0.07);
+      this.tone(f, t, 0.7, 'triangle', 0.12);
     });
-    this.tone(1319, 0.7, 0.8, 'sine', 0.05);
+    this.tone(1319, 0.95, 1.4, 'triangle', 0.14);
+    this.tone(1047, 0.95, 1.4, 'sine', 0.12);
+    this.tone(784, 0.95, 1.4, 'sine', 0.1);
   }
 }
 

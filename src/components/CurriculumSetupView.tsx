@@ -34,6 +34,7 @@ import { GreenBagMascot, PinkStarMascot } from './CurriculumMascots';
 import { VERIFIED_CARE_AVATARS, handleImageError } from '../lib/images';
 import { Sound } from '../utils/soundEffects';
 import { Confetti } from '../utils/confettiFx';
+import { FinaleCelebrationStage } from './FinaleCelebrationStage';
 
 // Exact artwork uploaded by user for Got a lot to add & Prefer to build it yourself (Next.js public paths)
 const objectiveFolderImg = '/objective-folder.png';
@@ -4166,11 +4167,9 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                       Sound.tick();
                       toast.info(`Moved to Section ${activeNoteSection + 1}`);
                     } else {
-                      Sound.fanfare();
-                      Confetti.rain(220, 3.5);
                       setCompletionCelebration(true);
                       onObjectivesConfigured();
-                      toast.success('Curriculum Setup Completed!', `${program.name} is now fully configured and ready.`);
+                      toast.success('Curriculum Setup Completed!', `${program.name} is now ready for the ribbon cutting celebration!`);
                     }
                   }}
                   className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors cursor-pointer flex items-center gap-2 shadow-xs"
@@ -4778,74 +4777,27 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
       )}
 
       {/* ====================================================================
-          FINALE CELEBRATION MODAL (Matching Carecentriq Guided Setup Celebration)
+          FINALE CELEBRATION STAGE (Interactive Ribbon Cutting from Guided Setup)
       ==================================================================== */}
-      {completionCelebration && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in duration-200 select-none"
-        >
-          <div className="w-full max-w-lg bg-white rounded-3xl p-6 sm:p-8 text-center shadow-2xl border border-grey-100 flex flex-col items-center space-y-4 animate-in zoom-in-95 duration-200">
-            {/* Celebrating Mascot Jumping */}
-            <div className="relative">
-              <img
-                src="/guided/coci_jump.webp"
-                alt="Coci Celebrating"
-                className="w-28 h-28 object-contain drop-shadow-md animate-bounce"
-              />
-              <span className="absolute -top-2 -left-2 text-2xl">🎉</span>
-              <span className="absolute -top-3 -right-2 text-2xl">✨</span>
-            </div>
-
-            <div className="space-y-1.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                Setup Complete · Ribbon Cutting
-              </span>
-              <h2 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
-                {program.name} is Ready!
-              </h2>
-              <p className="text-xs sm:text-sm text-grey-600 leading-relaxed max-w-md">
-                You’ve successfully configured your entire program curriculum: objectives, trainings, universal tasks, behavior measurement, calendar, and daily notes.
-              </p>
-            </div>
-
-            {/* Video preview / action */}
-            <div className="w-full pt-2 space-y-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveVideo(STEP_VIDEOS.celebration);
-                  Sound.fanfare();
-                }}
-                className="w-full py-3 px-5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
-              >
-                <Play className="w-4 h-4 fill-current text-emerald-700" />
-                <span>Watch celebration video (0:35)</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setCompletionCelebration(false);
-                  onReturnToDashboard();
-                }}
-                className="w-full py-3.5 px-6 rounded-2xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs sm:text-sm transition-all shadow-sm active:scale-98 cursor-pointer"
-              >
-                Return to dashboard
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setCompletionCelebration(false)}
-                className="text-xs font-semibold text-grey-500 hover:text-grey-900 underline transition-colors cursor-pointer"
-              >
-                Review setup
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <FinaleCelebrationStage
+        isOpen={completionCelebration}
+        onClose={() => setCompletionCelebration(false)}
+        onReturnToDashboard={() => {
+          setCompletionCelebration(false);
+          onReturnToDashboard();
+        }}
+        onWatchVideo={() => {
+          setActiveVideo(STEP_VIDEOS.celebration);
+          Sound.fanfare();
+        }}
+        programName={program.name}
+        programCategory={(program as any).category || 'Day Services'}
+        scheduleType="Regular program schedule"
+        isBehavioral={behaviorMethod === 'abc'}
+        objectivesCount={objectivesList.length}
+        trainingsCount={trainingsList.length}
+        tasksCount={tasksList.length}
+      />
 
       {/* ====================================================================
           FLOATING COCI COMPANION WIDGET (Your Friendly Guide - No Name Prompt)
