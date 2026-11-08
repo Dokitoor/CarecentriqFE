@@ -851,7 +851,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
       desc: 'Define the outcomes participants are working towards and measure their progress over time.',
       bg: 'bg-[#DDE5FE]',
       illustration: cardObjectivesImg,
-      animClass: 'anim-character-objectives',
       isSelected: true,
       onClick: () => setStep('objectives'),
     },
@@ -861,7 +860,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
       desc: 'Organise client development into skill areas and meaningful activities that support growth and progress.',
       bg: 'bg-[#D8ECC3]',
       illustration: cardTrainingsImg,
-      animClass: 'anim-character-trainings',
       isSelected: false,
       onClick: () => setStep('trainings'),
     },
@@ -871,7 +869,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
       desc: 'A shared set of measurable actions used to monitor progress and document performance across activities.',
       bg: 'bg-[#FCE8A6]',
       illustration: cardTasksImg,
-      animClass: 'anim-character-tasks',
       isSelected: false,
       onClick: () => setStep('tasks'),
     },
@@ -881,7 +878,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
       desc: 'Identify the key behaviours your team will monitor, document, and support throughout the program.',
       bg: 'bg-[#FED2C7]',
       illustration: cardBehaviorImg,
-      animClass: 'anim-character-behavior',
       isSelected: false,
       onClick: () => setStep('behavior'),
     },
@@ -891,7 +887,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
       desc: 'Select the methods your team will use to record behaviours and monitor progress.',
       bg: 'bg-[#DCF0B4]',
       illustration: cardMeasurementImg,
-      animClass: 'anim-character-measurement',
       isSelected: false,
       onClick: () => setStep('behavior'),
     },
@@ -928,7 +923,7 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
               </button>
 
               {/* Green Cute Bag Mascot */}
-              <div className="mb-6 anim-character-coci">
+              <div className="mb-6">
                 <GreenBagMascot variant="idle" size={84} />
               </div>
 
@@ -974,149 +969,8 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
             </div>
           </div>
 
-          {/* Right Column: 5 Horizontal Curriculum Cards Slide with ANIMATED Illustrations */}
+          {/* Right Column: 5 Horizontal Curriculum Cards Slide with EXACT Illustrations */}
           <div className="flex-1 bg-white p-6 sm:p-10 lg:p-12 flex flex-col justify-center overflow-x-auto">
-            {/* Custom Keyframe Animations for Each Illustration */}
-            <style>{`
-              /* Card 1: Program Objectives (Yellow Starburst Sun Character) */
-              @keyframes animCharacterObjectives {
-                0%, 100% {
-                  transform: translateY(0) scale(1) rotate(0deg);
-                  filter: drop-shadow(0 4px 8px rgba(235, 175, 15, 0.2));
-                }
-                50% {
-                  transform: translateY(-8px) scale(1.03) rotate(1.2deg);
-                  filter: drop-shadow(0 12px 20px rgba(255, 215, 0, 0.52));
-                }
-              }
-              .anim-character-objectives {
-                transform-origin: 50% 100%;
-                animation: animCharacterObjectives 3.2s ease-in-out infinite;
-                will-change: transform, filter;
-              }
-
-              /* Card 2: Trainings & Activities (Orange Donut Archer) */
-              @keyframes animCharacterTrainings {
-                0%, 100% {
-                  transform: translateY(0) rotate(0deg) scale(1);
-                }
-                30% {
-                  transform: translateY(-2px) rotate(-2.5deg) scale(0.99);
-                }
-                65% {
-                  transform: translateY(-7px) rotate(2deg) scale(1.02);
-                }
-                85% {
-                  transform: translateY(-1px) rotate(-0.5deg) scale(1.01);
-                }
-              }
-              .anim-character-trainings {
-                transform-origin: 50% 100%;
-                animation: animCharacterTrainings 3.6s ease-in-out infinite;
-                animation-delay: 0.25s;
-                will-change: transform;
-              }
-
-              /* Card 3: Tasks (Blue Diamond Kite Pointer) */
-              @keyframes animCharacterTasks {
-                0%, 100% {
-                  transform: translateY(0) translateX(0) rotate(0deg);
-                }
-                25% {
-                  transform: translateY(-7px) translateX(4px) rotate(2.5deg);
-                }
-                50% {
-                  transform: translateY(-3px) translateX(0) rotate(0deg);
-                }
-                75% {
-                  transform: translateY(-9px) translateX(-4px) rotate(-2.5deg);
-                }
-              }
-              .anim-character-tasks {
-                transform-origin: 50% 80%;
-                animation: animCharacterTasks 4s ease-in-out infinite;
-                animation-delay: 0.5s;
-                will-change: transform;
-              }
-
-              /* Card 4: Behavior (Pink Star Dreamer) */
-              @keyframes animCharacterBehavior {
-                0%, 100% {
-                  transform: translateY(0) rotate(0deg) scale(1, 1);
-                }
-                35% {
-                  transform: translateY(-5px) rotate(-2deg) scale(1.025, 0.975);
-                }
-                70% {
-                  transform: translateY(-2px) rotate(1.8deg) scale(0.98, 1.02);
-                }
-              }
-              .anim-character-behavior {
-                transform-origin: 50% 100%;
-                animation: animCharacterBehavior 3.8s ease-in-out infinite;
-                animation-delay: 0.75s;
-                will-change: transform;
-              }
-
-              /* Card 5: Behavior Measurement (Purple Cyclops Monster) */
-              @keyframes animCharacterMeasurement {
-                0%, 100% {
-                  transform: translateY(0) scale(1, 1) rotate(0deg);
-                }
-                15% {
-                  transform: translateY(2px) scale(1.04, 0.96) rotate(0deg);
-                }
-                45% {
-                  transform: translateY(-10px) scale(0.96, 1.04) rotate(-2deg);
-                }
-                70% {
-                  transform: translateY(0) scale(1.03, 0.97) rotate(1.2deg);
-                }
-                85% {
-                  transform: translateY(-2px) scale(1, 1) rotate(0deg);
-                }
-              }
-              .anim-character-measurement {
-                transform-origin: 50% 100%;
-                animation: animCharacterMeasurement 3.4s ease-in-out infinite;
-                animation-delay: 0.4s;
-                will-change: transform;
-              }
-
-              /* Left Mascot Coci Idle Bounce */
-              @keyframes animCharacterCoci {
-                0%, 100% {
-                  transform: translateY(0) rotate(0deg);
-                }
-                50% {
-                  transform: translateY(-6px) rotate(-1.5deg);
-                }
-              }
-              .anim-character-coci {
-                animation: animCharacterCoci 3s ease-in-out infinite;
-                transform-origin: 50% 100%;
-                will-change: transform;
-              }
-
-              /* Delightful Hover Accelerations */
-              .group:hover .anim-character-objectives {
-                animation-duration: 1.5s;
-                filter: drop-shadow(0 14px 22px rgba(255, 215, 0, 0.65));
-              }
-              .group:hover .anim-character-trainings {
-                animation-duration: 1.6s;
-              }
-              .group:hover .anim-character-tasks {
-                animation-duration: 1.8s;
-              }
-              .group:hover .anim-character-behavior {
-                animation-duration: 1.6s;
-              }
-              .group:hover .anim-character-measurement {
-                animation-duration: 1.5s;
-              }
-            `}</style>
-
             <div className="flex items-stretch gap-5 min-w-max pb-4">
               {CURRICULUM_CARDS.map((card) => (
                 <div
@@ -1140,16 +994,12 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     </p>
                   </div>
 
-                  {/* Bottom Exact Animated Illustration Container */}
+                  {/* Bottom Exact Illustration Container */}
                   <div className={cn('w-full pt-4 rounded-b-3xl overflow-hidden mt-auto flex items-end justify-center', card.bg)}>
                     <img
                       src={card.illustration}
                       alt={card.title}
-                      className={cn(
-                        "w-full h-44 sm:h-48 object-contain object-bottom pointer-events-none select-none transition-all duration-300",
-                        card.animClass,
-                        "group-hover:scale-105"
-                      )}
+                      className="w-full h-44 sm:h-48 object-contain object-bottom pointer-events-none select-none transition-transform group-hover:scale-105"
                     />
                   </div>
                 </div>
