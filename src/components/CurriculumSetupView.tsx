@@ -446,43 +446,6 @@ export const CurriculumSetupView: React.FC<CurriculumSetupViewProps> = ({
     toast.success('Task Added', `Added "${manualTaskTitle.trim()}".`);
   };
 
-  // Reusable Top-Left Stepper matching media_1794072521860_fb9b3188.jpg & media_1794072863356_3b0d21bb.jpg
-  const renderTopLeftStepper = (currentStep: number) => (
-    <div className="flex items-center gap-1.5 sm:gap-2 mb-6">
-      {[1, 2, 3, 4, 5, 6].map((num) => {
-        const isCurrent = currentStep === num;
-        const isPast = currentStep > num;
-        return (
-          <button
-            key={num}
-            type="button"
-            onClick={() => {
-              const stepMap: Record<number, CurriculumStep> = {
-                1: 'objectives',
-                2: 'trainings',
-                3: 'tasks',
-                4: 'behavior',
-                5: 'calendar',
-                6: 'daily-note',
-              };
-              if (stepMap[num]) setStep(stepMap[num]);
-            }}
-            className={cn(
-              'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer',
-              isCurrent
-                ? 'bg-[#0A0A0A] text-white shadow-xs ring-2 ring-black/15 scale-105'
-                : isPast
-                ? 'bg-grey-200 text-grey-800 hover:bg-grey-300'
-                : 'bg-grey-100 text-grey-400 hover:bg-grey-200'
-            )}
-            title={`Go to Step ${num}`}
-          >
-            {num}
-          </button>
-        );
-      })}
-    </div>
-  );
 
   // Soft decorative background wavy ribbon for explanation panels
   const renderPanelRibbon = (colorClass: string) => (
@@ -993,30 +956,29 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
               </div>
             </>
           ) : (
-            /* MANUAL OBJECTIVES BUILDER (EXACT MATCH TO media_1794072521860_fb9b3188.jpg) */
+            /* MANUAL OBJECTIVES BUILDER */
             <>
               <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-between overflow-y-auto">
                 <div className="space-y-6 max-w-3xl">
-                  {/* Top-Left Stepper */}
-                  {renderTopLeftStepper(1)}
-
-                  {/* Back button to choice */}
-                  <div>
+                  {/* Header with back arrow right beside it */}
+                  <div className="flex items-start gap-4 mb-6">
                     <button
                       type="button"
                       onClick={() => setObjectiveMode('choice')}
-                      className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shadow-2xs mb-4"
-                      title="Back to options"
+                      className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 mt-1 shadow-2xs"
+                      title="Back"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
 
-                    <h1 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
-                      Manually fill your program objectives
-                    </h1>
-                    <p className="text-xs sm:text-sm text-grey-500 mt-1">
-                      Add objectives one by one
-                    </p>
+                    <div className="space-y-1">
+                      <h1 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
+                        Manually fill your program objectives
+                      </h1>
+                      <p className="text-xs sm:text-sm text-grey-500">
+                        Add objectives one by one
+                      </p>
+                    </div>
                   </div>
 
                   {/* Card for typing objective */}
@@ -1099,7 +1061,7 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     onClick={() => setObjectiveMode('choice')}
                     className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-700 transition-colors cursor-pointer"
                   >
-                    Back to choices
+                    Back
                   </button>
 
                   <button
@@ -1117,19 +1079,14 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                 </div>
               </div>
 
-              {/* Right Side Panel (Matching Image 4) */}
+              {/* Right Side Panel */}
               <div className="w-full md:w-[380px] lg:w-[420px] bg-[#DCE5FE] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-blue-100/60">
                 {renderPanelRibbon('text-blue-400')}
-                <button
-                  type="button"
-                  onClick={onReturnToDashboard}
-                  className="absolute top-6 right-6 w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-grey-600 hover:text-grey-900 transition-colors cursor-pointer z-20"
-                  title="Close and return to dashboard"
-                >
-                  <X className="w-4 h-4" />
-                </button>
 
-                <div className="space-y-6 z-10 pt-4">
+                <div className="space-y-6 z-10">
+                  {/* Page Numbering Atop Explanation Segment */}
+                  {renderStepProgressPills(1)}
+
                   <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-2.5">
                     <div className="flex items-center justify-between">
                       <h4 className="font-bold text-sm text-grey-900">What is an objective</h4>
@@ -1359,30 +1316,29 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
               </div>
             </>
           ) : (
-            /* MANUAL TRAININGS & ACTIVITIES BUILDER (EXACT MATCH TO media_1794072863356_3b0d21bb.jpg) */
+            /* MANUAL TRAININGS & ACTIVITIES BUILDER */
             <>
               <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-between overflow-y-auto">
                 <div className="space-y-6 max-w-3xl">
-                  {/* Top-Left Stepper */}
-                  {renderTopLeftStepper(2)}
-
-                  {/* Back button */}
-                  <div>
+                  {/* Header with back arrow right beside it */}
+                  <div className="flex items-start gap-4 mb-6">
                     <button
                       type="button"
                       onClick={() => setTrainingMode('choice')}
-                      className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shadow-2xs mb-4"
-                      title="Back to options"
+                      className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 mt-1 shadow-2xs"
+                      title="Back"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
 
-                    <h1 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
-                      Manually fill your training components and activities
-                    </h1>
-                    <p className="text-xs sm:text-sm text-grey-500 mt-1">
-                      Add training components and activities one by one
-                    </p>
+                    <div className="space-y-1">
+                      <h1 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
+                        Manually fill your training components and activities
+                      </h1>
+                      <p className="text-xs sm:text-sm text-grey-500">
+                        Add training components and activities one by one
+                      </p>
+                    </div>
                   </div>
 
                   {/* Card for typing training component and nested activities */}
@@ -1520,7 +1476,7 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     onClick={() => setTrainingMode('choice')}
                     className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-700 transition-colors cursor-pointer"
                   >
-                    Back to choices
+                    Back
                   </button>
 
                   <button
@@ -1538,19 +1494,14 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                 </div>
               </div>
 
-              {/* Right Side Panel (Matching Image 5) */}
+              {/* Right Side Panel */}
               <div className="w-full md:w-[380px] lg:w-[420px] bg-[#E8F8D8] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-emerald-100">
                 {renderPanelRibbon('text-emerald-400')}
-                <button
-                  type="button"
-                  onClick={onReturnToDashboard}
-                  className="absolute top-6 right-6 w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-grey-600 hover:text-grey-900 transition-colors cursor-pointer z-20"
-                  title="Close and return to dashboard"
-                >
-                  <X className="w-4 h-4" />
-                </button>
 
-                <div className="space-y-6 z-10 pt-4">
+                <div className="space-y-6 z-10">
+                  {/* Page Numbering Atop Explanation Segment */}
+                  {renderStepProgressPills(2)}
+
                   <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-2.5">
                     <div className="flex items-center justify-between">
                       <h4 className="font-bold text-sm text-grey-900">What are training components?</h4>
@@ -1801,26 +1752,25 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
             <>
               <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-between overflow-y-auto">
                 <div className="space-y-6 max-w-3xl">
-                  {/* Top-Left Stepper */}
-                  {renderTopLeftStepper(3)}
-
-                  {/* Back button */}
-                  <div>
+                  {/* Header with back arrow right beside it */}
+                  <div className="flex items-start gap-4 mb-6">
                     <button
                       type="button"
                       onClick={() => setTaskMode('choice')}
-                      className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shadow-2xs mb-4"
-                      title="Back to options"
+                      className="w-9 h-9 rounded-full bg-grey-100 hover:bg-grey-200 text-grey-800 flex items-center justify-center transition-colors cursor-pointer shrink-0 mt-1 shadow-2xs"
+                      title="Back"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
 
-                    <h1 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
-                      Manually fill your universal tasks
-                    </h1>
-                    <p className="text-xs sm:text-sm text-grey-500 mt-1">
-                      Review preset tasks or add custom tasks one by one
-                    </p>
+                    <div className="space-y-1">
+                      <h1 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
+                        Manually fill your universal tasks
+                      </h1>
+                      <p className="text-xs sm:text-sm text-grey-500">
+                        Review preset tasks or add custom tasks one by one
+                      </p>
+                    </div>
                   </div>
 
                   {/* Card for typing custom task */}
@@ -1939,7 +1889,7 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     onClick={() => setTaskMode('choice')}
                     className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-700 transition-colors cursor-pointer"
                   >
-                    Back to choices
+                    Back
                   </button>
 
                   <button
@@ -1959,16 +1909,11 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
               {/* Right Side Panel */}
               <div className="w-full md:w-[380px] lg:w-[420px] bg-[#EDE7FE] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-purple-100">
                 {renderPanelRibbon('text-purple-400')}
-                <button
-                  type="button"
-                  onClick={onReturnToDashboard}
-                  className="absolute top-6 right-6 w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center text-grey-600 hover:text-grey-900 transition-colors cursor-pointer z-20"
-                  title="Close and return to dashboard"
-                >
-                  <X className="w-4 h-4" />
-                </button>
 
-                <div className="space-y-6 z-10 pt-4">
+                <div className="space-y-6 z-10">
+                  {/* Page Numbering Atop Explanation Segment */}
+                  {renderStepProgressPills(3)}
+
                   <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-2.5">
                     <div className="flex items-center justify-between">
                       <h4 className="font-bold text-sm text-grey-900">What are universal tasks?</h4>
