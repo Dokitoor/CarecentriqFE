@@ -799,68 +799,45 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
 
   // Step indicator component placed atop the right explanation segment
   const renderStepProgressPills = (stepNum: number) => {
-    const videoInfo = STEP_VIDEOS[step];
-    const helpCard = STEP_HELP_CARDS[step];
-
     return (
-      <div className="pb-5 mb-6 border-b border-black/[0.08] w-full space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          {/* Stepper Progress Pills 1-6 */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {[1, 2, 3, 4, 5, 6].map((num) => {
-              const isCurrent = stepNum === num;
-              const isPast = stepNum > num;
-              return (
-                <button
-                  key={num}
-                  type="button"
-                  onClick={() => {
-                    const stepMap: Record<number, CurriculumStep> = {
-                      1: 'objectives',
-                      2: 'trainings',
-                      3: 'tasks',
-                      4: 'behavior',
-                      5: 'calendar',
-                      6: 'daily-note',
-                    };
-                    if (stepMap[num]) {
-                      setStep(stepMap[num]);
-                      Sound.tick();
-                    }
-                  }}
-                  className={cn(
-                    'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer',
-                    isCurrent
-                      ? 'bg-[#0A0A0A] text-white shadow-xs ring-2 ring-black/15 scale-105'
-                      : isPast
-                      ? 'bg-black/15 text-grey-800 hover:bg-black/25'
-                      : 'bg-black/5 text-grey-400 hover:bg-black/10'
-                  )}
-                  title={`Go to Step ${num}`}
-                >
-                  {num}
-                </button>
-              );
-            })}
-            <button
-              type="button"
-              onClick={() => {
-                setCompletionCelebration(true);
-                Sound.fanfare();
-              }}
-              className="px-2.5 py-1 rounded-full flex items-center gap-1 text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs cursor-pointer transition-all ml-1 shrink-0"
-              title="Ribbon Cutting Ceremony"
-            >
-              <span>🎀 Ribbon Cutting</span>
-            </button>
-          </div>
-
-          {/* Step Counter */}
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold text-grey-700 uppercase tracking-wider shrink-0">
-              Step {stepNum} of 6
-            </span>
-          </div>
+      <div className="flex items-center justify-end w-full pb-4 mb-5 border-b border-black/[0.08]">
+        {/* Stepper Progress Pills 1-6 */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {[1, 2, 3, 4, 5, 6].map((num) => {
+            const isCurrent = stepNum === num;
+            const isPast = stepNum > num;
+            return (
+              <button
+                key={num}
+                type="button"
+                onClick={() => {
+                  const stepMap: Record<number, CurriculumStep> = {
+                    1: 'objectives',
+                    2: 'trainings',
+                    3: 'tasks',
+                    4: 'behavior',
+                    5: 'calendar',
+                    6: 'daily-note',
+                  };
+                  if (stepMap[num]) {
+                    setStep(stepMap[num]);
+                    Sound.tick();
+                  }
+                }}
+                className={cn(
+                  'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer',
+                  isCurrent
+                    ? 'bg-[#0A0A0A] text-white shadow-xs ring-2 ring-black/15 scale-105'
+                    : isPast
+                    ? 'bg-black/15 text-grey-800 hover:bg-black/25'
+                    : 'bg-black/5 text-grey-400 hover:bg-black/10'
+                )}
+                title={`Go to Step ${num}`}
+              >
+                {num}
+              </button>
+            );
+          })}
         </div>
       </div>
     );
@@ -2353,72 +2330,40 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                 </div>
 
                 {/* Bottom Actions for Choice Page */}
-                <div className="mt-8 pt-4 flex items-center justify-between border-t border-grey-100">
-                  <button
-                    type="button"
-                    onClick={() => setStep('tasks')}
-                    className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-700 transition-colors cursor-pointer"
-                  >
-                    Back to tasks
-                  </button>
-
+                <div className="mt-8 pt-2">
                   <button
                     type="button"
                     onClick={() => {
                       setStep('calendar');
                       toast.info('Skipped Behavior Setup', 'Moved to calendar setup.');
                     }}
-                    className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-700 transition-colors cursor-pointer"
+                    className="text-xs sm:text-sm font-medium text-grey-500 hover:text-grey-900 underline underline-offset-4 transition-colors cursor-pointer"
                   >
                     Skip for now
                   </button>
                 </div>
               </div>
 
-              {/* Right Side: Consistent Grey Supporting Preview Area with Mobile Phone Mockup */}
-              <div className="w-[390px] lg:w-[430px] xl:w-[460px] bg-[#EEF0F3] p-5 lg:p-6 border-l border-grey-200/90 flex flex-col justify-start shrink-0 select-none overflow-y-auto">
-                <div className="space-y-3.5 max-w-[325px] mx-auto w-full">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-bold text-sm text-grey-900">Staff phone preview</h3>
-                      <p className="text-[11px] text-grey-500 mt-0.5">
-                        Real-time mobile preview
-                      </p>
+              {/* Right Side: Peach Info Panel */}
+              <div className="w-full md:w-[380px] lg:w-[420px] bg-[#FDF3EE] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-rose-100/60">
+                {renderPanelRibbon('text-rose-400')}
+                <div className="space-y-6 z-10">
+                  {renderStepProgressPills(4)}
+                  <div className="p-5 rounded-2xl bg-white shadow-2xs border border-white/80 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm text-grey-900">What is behavior measurement?</h4>
+                      <div className="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center text-amber-700">
+                        <FileText className="w-3.5 h-3.5" />
+                      </div>
                     </div>
-                    {renderStepProgressPills(4)}
+                    <p className="text-xs text-grey-600 leading-relaxed">
+                      Measurement settings define how staff record observations. Choose one tracking method for this configuration. Both methods use each client’s assigned ISP Objectives.
+                    </p>
                   </div>
+                </div>
 
-                  <MobilePhoneMockup
-                    title="Behavior Tracking"
-                    subtitle="Joe Doe · October 5, 2026"
-                    badge="Staff view"
-                  >
-                    <div className="space-y-3 text-xs font-sans">
-                      <div className="p-3 rounded-2xl bg-emerald-50/60 border border-emerald-200/60 space-y-1">
-                        <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">
-                          Shift Observation
-                        </span>
-                        <p className="text-[11px] text-emerald-950 font-medium leading-relaxed">
-                          Staff track behavioral observations directly on their phones. Select either ABC Tracking or Custom Measurements on the left to configure.
-                        </p>
-                      </div>
-
-                      <div className="p-3 rounded-2xl border border-grey-200 bg-white space-y-2">
-                        <div className="flex items-center justify-between">
-                          <b className="text-[11px] font-bold text-grey-900">Incident · 9:15 AM</b>
-                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                            Logged
-                          </span>
-                        </div>
-                        <div className="text-[10px] space-y-1 text-grey-700">
-                          <div><span className="text-grey-400">Behavior:</span> <b className="text-grey-900">Aggression</b></div>
-                          <div><span className="text-grey-400">Antecedent:</span> Waiting</div>
-                          <div><span className="text-grey-400">Action:</span> Refused or turned away</div>
-                          <div><span className="text-grey-400">Consequence:</span> Staff redirected</div>
-                        </div>
-                      </div>
-                    </div>
-                  </MobilePhoneMockup>
+                <div className="pt-6 text-xs text-grey-500 text-right z-10">
+                  After behavior measurement, you'll configure your program calendar.
                 </div>
               </div>
             </>
@@ -2617,7 +2562,7 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     onClick={() => setBehaviorPage('choice')}
                     className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-700 transition-colors cursor-pointer"
                   >
-                    Back to choices
+                    Back
                   </button>
 
                   <button
@@ -2638,14 +2583,15 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
               {/* RIGHT COLUMN: SUPPORTING GREY PREVIEW AREA WITH REAL MOBILE PHONE MOCKUP */}
               <div className="w-[390px] lg:w-[430px] xl:w-[460px] bg-[#EEF0F3] p-5 lg:p-6 border-l border-grey-200/90 flex flex-col justify-start shrink-0 select-none overflow-y-auto">
                 <div className="space-y-3.5 max-w-[325px] mx-auto w-full">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-bold text-sm text-grey-900">Staff phone preview</h3>
-                      <p className="text-[11px] text-grey-500 mt-0.5">
-                        Real-time mobile view · Test incident logging
-                      </p>
-                    </div>
-                    {renderStepProgressPills(4)}
+                  {/* Step Progress Numbering Atop Preview */}
+                  {renderStepProgressPills(4)}
+
+                  {/* Unsqueezed Preview Title & Subtitle Below Numbering */}
+                  <div>
+                    <h3 className="font-bold text-sm text-grey-900">Staff phone preview</h3>
+                    <p className="text-[11px] text-grey-500 mt-0.5">
+                      Real-time mobile view · Test incident logging
+                    </p>
                   </div>
 
                   <MobilePhoneMockup
@@ -2962,20 +2908,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     </button>
                   );
                 })}
-                <span className="text-[11px] font-bold text-grey-600 uppercase tracking-wider ml-1">
-                  Step 5 of 6
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCompletionCelebration(true);
-                    Sound.fanfare();
-                  }}
-                  className="px-3 py-1 rounded-full flex items-center gap-1 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs cursor-pointer transition-all ml-1.5 shrink-0"
-                  title="Ribbon Cutting Ceremony"
-                >
-                  <span>🎀 Ribbon Cutting</span>
-                </button>
               </div>
             </div>
           </div>
@@ -3598,20 +3530,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     </button>
                   );
                 })}
-                <span className="text-[11px] font-bold text-grey-600 uppercase tracking-wider ml-1">
-                  Step 6 of 6
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCompletionCelebration(true);
-                    Sound.fanfare();
-                  }}
-                  className="px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm cursor-pointer transition-all ml-1.5 shrink-0"
-                  title="Ribbon Cutting Ceremony"
-                >
-                  <span>🎀 Ribbon Cutting</span>
-                </button>
               </div>
             </div>
           </div>
@@ -4074,17 +3992,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                   >
                     Back
                   </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCompletionCelebration(true);
-                      Sound.fanfare();
-                    }}
-                    className="px-4 py-2.5 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs"
-                  >
-                    <span>🎀 Cut the Ribbon Now</span>
-                  </button>
                 </div>
 
                 <button
@@ -4106,7 +4013,7 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     {activeNoteSection === 1 && 'Continue to Provider Questions'}
                     {activeNoteSection === 2 && 'Continue to Activity & Progress'}
                     {activeNoteSection === 3 && 'Continue to Daily Note'}
-                    {activeNoteSection === 4 && 'Proceed'}
+                    {activeNoteSection === 4 && 'Finish Setup & Cut Ribbon 🎉'}
                   </span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
@@ -4124,7 +4031,10 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                   <div>
                     <h3 className="font-bold text-sm text-grey-900">Staff phone preview</h3>
                     <p className="text-[11px] text-grey-500 mt-0.5">
-                      Section {activeNoteSection} of 4 · Real-time preview
+                      {activeNoteSection === 1 && 'Client information & attendance'}
+                      {activeNoteSection === 2 && 'Provider questions'}
+                      {activeNoteSection === 3 && 'Activity & progress'}
+                      {activeNoteSection === 4 && 'Daily note & signature'}
                     </p>
                   </div>
 
@@ -4148,7 +4058,7 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                   </button>
                 </div>
 
-                {/* 100% VISIBLE INTERACTIVE IPHONE MOCKUP */}
+                {/* 100% VISIBLE INTERACTIVE IPHONE MOCKUP - SEGMENTED (NO SCROLLING) */}
                 <MobilePhoneMockup
                   title="Daily Note"
                   subtitle="Joe Doe · October 5, 2026"
@@ -4156,58 +4066,52 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                 >
                   <div className="space-y-3 text-xs font-sans">
                     {/* ====================================================
-                        SECTION 1: Client Information & Attendance
+                        SECTION 1: Client Information & Attendance ONLY
                     ==================================================== */}
-                      <div className={cn(
-                        "p-2.5 rounded-2xl border transition-all space-y-2",
-                        activeNoteSection === 1
-                          ? "border-emerald-400 bg-emerald-50/20 ring-1 ring-emerald-400/30"
-                          : "border-grey-200 bg-white"
-                      )}>
-                        <div className="flex items-center justify-between">
-                          <b className="text-[10px] font-bold text-grey-900">1 · Client information & attendance</b>
-                          {activeNoteSection === 1 && (
-                            <span className="text-[8px] font-bold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.5 rounded-full">
-                              Editing
-                            </span>
-                          )}
+                    {activeNoteSection === 1 && (
+                      <div className="p-3 rounded-2xl border border-emerald-400 bg-white ring-1 ring-emerald-400/30 space-y-2.5 shadow-2xs animate-in fade-in duration-200">
+                        <div className="flex items-center justify-between pb-1.5 border-b border-grey-100">
+                          <b className="text-[11px] font-bold text-grey-900">Client Information & Attendance</b>
+                          <span className="text-[8px] font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">
+                            Active
+                          </span>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-1.5 text-[9px]">
+                        <div className="grid grid-cols-2 gap-2 text-[10px]">
                           <div>
-                            <span className="text-grey-400 block">Client</span>
+                            <span className="text-grey-400 block text-[9px]">Client</span>
                             <span className="font-semibold text-grey-800">Joe Doe</span>
                           </div>
                           <div>
-                            <span className="text-grey-400 block">Date</span>
+                            <span className="text-grey-400 block text-[9px]">Date</span>
                             <span className="font-semibold text-grey-800">Oct 5, 2026</span>
                           </div>
                           {showUci && (
                             <div>
-                              <span className="text-grey-400 block">UCI number</span>
+                              <span className="text-grey-400 block text-[9px]">UCI number</span>
                               <span className="font-mono font-semibold text-grey-800">1234567</span>
                             </div>
                           )}
                           <div className={!showUci ? "col-span-2" : ""}>
-                            <span className="text-grey-400 block">Assigned Staff</span>
+                            <span className="text-grey-400 block text-[9px]">Assigned Staff</span>
                             <span className="font-semibold text-grey-800 truncate block">Reuben Stewart</span>
                           </div>
                         </div>
 
-                        <div className="text-[9px] pt-1 border-t border-grey-100">
-                          <span className="text-grey-400 block">Scheduled hours</span>
-                          <span className="font-medium text-grey-700">3 hours · 9AM–12PM</span>
+                        <div className="text-[10px] pt-1.5 border-t border-grey-100">
+                          <span className="text-grey-400 block text-[9px]">Scheduled hours</span>
+                          <span className="font-medium text-grey-700">3 hours · 9:00 AM – 12:00 PM</span>
                         </div>
 
-                        <div className="pt-1">
-                          <label className="text-[9px] font-semibold text-grey-700 block">Attendance</label>
+                        <div className="pt-1.5 space-y-1">
+                          <label className="text-[10px] font-semibold text-grey-800 block">Attendance *</label>
                           <select
                             value={phoneAttendance}
                             onChange={(e) => {
                               setPhoneAttendance(e.target.value as 'Present' | 'Absent');
                               Sound.tick();
                             }}
-                            className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer mt-0.5"
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-grey-300 bg-white text-[11px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
                           >
                             <option value="Present">Present</option>
                             <option value="Absent">Absent</option>
@@ -4215,12 +4119,12 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                         </div>
 
                         {phoneAttendance === 'Absent' && (
-                          <div className="space-y-1 pt-1 animate-in fade-in">
-                            <span className="text-[9px] font-semibold text-grey-700 block">Absence reason</span>
+                          <div className="space-y-1.5 pt-1.5 animate-in fade-in">
+                            <span className="text-[10px] font-semibold text-grey-700 block">Absence reason *</span>
                             <select
                               value={phoneAbsenceReason}
                               onChange={(e) => setPhoneAbsenceReason(e.target.value)}
-                              className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                              className="w-full px-2.5 py-1.5 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
                             >
                               <option value="Illness">Illness</option>
                               <option value="Medical Appointment">Medical Appointment</option>
@@ -4228,50 +4132,46 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                               <option value="Transportation Delay">Transportation Delay</option>
                               <option value="Other">Other</option>
                             </select>
-                            <div className="p-1.5 rounded-lg bg-emerald-50 text-[8px] text-emerald-800 font-medium">
-                              Only the absence reason is recorded.
+                            <div className="p-2 rounded-lg bg-emerald-50 text-[9px] text-emerald-800 font-medium">
+                              Only the absence reason is recorded for this shift.
                             </div>
                           </div>
                         )}
                       </div>
+                    )}
 
-                      {/* ====================================================
-                          SECTION 2: Provider Questions
-                      ==================================================== */}
-                      <div className={cn(
-                        "p-2.5 rounded-2xl border transition-all space-y-2",
-                        phoneAttendance === 'Absent' && "opacity-35 pointer-events-none select-none",
-                        activeNoteSection === 2
-                          ? "border-emerald-400 bg-emerald-50/20 ring-1 ring-emerald-400/30"
-                          : "border-grey-200 bg-white"
-                      )}>
-                        <div className="flex items-center justify-between">
-                          <b className="text-[10px] font-bold text-grey-900">2 · Provider questions</b>
-                          {activeNoteSection === 2 && (
-                            <span className="text-[8px] font-bold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.5 rounded-full">
-                              Editing
-                            </span>
-                          )}
+                    {/* ====================================================
+                        SECTION 2: Provider Questions ONLY
+                    ==================================================== */}
+                    {activeNoteSection === 2 && (
+                      <div className="p-3 rounded-2xl border border-emerald-400 bg-white ring-1 ring-emerald-400/30 space-y-3 shadow-2xs animate-in fade-in duration-200">
+                        <div className="flex items-center justify-between pb-1.5 border-b border-grey-100">
+                          <b className="text-[11px] font-bold text-grey-900">Provider Questions</b>
+                          <span className="text-[8px] font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">
+                            Active
+                          </span>
                         </div>
 
                         {!requireParticipation && !activitiesCompletedToggle && !behaviorRedirectionToggle ? (
-                          <p className="text-[9px] text-grey-400 italic">No provider questions turned on.</p>
+                          <div className="p-4 rounded-xl bg-grey-50 text-center text-xs text-grey-400 italic">
+                            No provider questions turned on. Turn questions on using the switches on the left.
+                          </div>
                         ) : (
-                          <div className="space-y-2">
+                          <div className="space-y-3">
                             {requireParticipation && (
-                              <div className="space-y-0.5">
-                                <span className="text-grey-700 block text-[9px] font-medium">
+                              <div className="space-y-1">
+                                <span className="text-grey-800 block text-[10px] font-medium">
                                   Did the client participate? *
                                 </span>
-                                <div className="flex gap-1.5">
+                                <div className="flex gap-2">
                                   <button
                                     type="button"
                                     onClick={() => setPhoneParticipated('Yes')}
                                     className={cn(
-                                      "flex-1 py-1 rounded-md text-[9px] font-semibold border transition-all",
+                                      "flex-1 py-1.5 rounded-lg text-[10px] font-semibold border transition-all cursor-pointer",
                                       phoneParticipated === 'Yes'
                                         ? "bg-[#0A0A0A] text-white border-black"
-                                        : "bg-white text-grey-700 border-grey-200"
+                                        : "bg-white text-grey-700 border-grey-200 hover:bg-grey-50"
                                     )}
                                   >
                                     Yes
@@ -4280,10 +4180,10 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                                     type="button"
                                     onClick={() => setPhoneParticipated('No')}
                                     className={cn(
-                                      "flex-1 py-1 rounded-md text-[9px] font-semibold border transition-all",
+                                      "flex-1 py-1.5 rounded-lg text-[10px] font-semibold border transition-all cursor-pointer",
                                       phoneParticipated === 'No'
                                         ? "bg-[#0A0A0A] text-white border-black"
-                                        : "bg-white text-grey-700 border-grey-200"
+                                        : "bg-white text-grey-700 border-grey-200 hover:bg-grey-50"
                                     )}
                                   >
                                     No
@@ -4293,14 +4193,14 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                             )}
 
                             {activitiesCompletedToggle && (
-                              <div className="space-y-0.5">
-                                <span className="text-grey-700 block text-[9px] font-medium">
+                              <div className="space-y-1">
+                                <span className="text-grey-800 block text-[10px] font-medium">
                                   Were scheduled activities completed? *
                                 </span>
                                 <select
                                   value={phoneGoalsMet}
                                   onChange={(e) => setPhoneGoalsMet(e.target.value)}
-                                  className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[9px] font-semibold text-grey-900 focus:outline-none"
+                                  className="w-full px-2.5 py-1.5 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
                                 >
                                   <option value="Yes">Yes</option>
                                   <option value="Partial">Partial</option>
@@ -4310,13 +4210,13 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                             )}
 
                             {behaviorRedirectionToggle && (
-                              <div className="space-y-0.5">
-                                <span className="text-grey-700 block text-[9px] font-medium">
+                              <div className="space-y-1">
+                                <span className="text-grey-800 block text-[10px] font-medium">
                                   Any behavioral redirections required?
                                 </span>
                                 <select
                                   defaultValue="No"
-                                  className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[9px] font-semibold text-grey-900 focus:outline-none"
+                                  className="w-full px-2.5 py-1.5 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
                                 >
                                   <option value="No">No</option>
                                   <option value="Yes - Logged">Yes - Logged</option>
@@ -4326,27 +4226,21 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                           </div>
                         )}
                       </div>
+                    )}
 
-                      {/* ====================================================
-                          SECTION 3: Activity & Progress
-                      ==================================================== */}
-                      <div className={cn(
-                        "p-2.5 rounded-2xl border transition-all space-y-2",
-                        phoneAttendance === 'Absent' && "opacity-35 pointer-events-none select-none",
-                        activeNoteSection === 3
-                          ? "border-emerald-400 bg-emerald-50/20 ring-1 ring-emerald-400/30"
-                          : "border-grey-200 bg-white"
-                      )}>
-                        <div className="flex items-center justify-between">
-                          <b className="text-[10px] font-bold text-grey-900">3 · Activity & progress</b>
-                          {activeNoteSection === 3 && (
-                            <span className="text-[8px] font-bold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.5 rounded-full">
-                              Editing
-                            </span>
-                          )}
+                    {/* ====================================================
+                        SECTION 3: Activity & Progress ONLY
+                    ==================================================== */}
+                    {activeNoteSection === 3 && (
+                      <div className="p-3 rounded-2xl border border-emerald-400 bg-white ring-1 ring-emerald-400/30 space-y-2.5 shadow-2xs animate-in fade-in duration-200">
+                        <div className="flex items-center justify-between pb-1.5 border-b border-grey-100">
+                          <b className="text-[11px] font-bold text-grey-900">Activity & Progress</b>
+                          <span className="text-[8px] font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">
+                            Active
+                          </span>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-1 text-[9px] bg-grey-50/70 p-1.5 rounded-xl border border-grey-100">
+                        <div className="grid grid-cols-2 gap-1.5 text-[9px] bg-grey-50/80 p-2 rounded-xl border border-grey-100">
                           <div>
                             <span className="text-grey-400 block text-[8px]">Training</span>
                             <span className="font-semibold text-grey-900 truncate block">
@@ -4361,51 +4255,51 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                           </div>
                         </div>
 
-                        <div className="space-y-0.5 text-[9px]">
+                        <div className="space-y-1 text-[9px]">
                           <span className="text-grey-500 block text-[8px]">Did client follow calendar?</span>
-                          <div className="px-2 py-1 rounded-md bg-white border border-grey-200 font-semibold text-grey-800">
+                          <div className="px-2.5 py-1 rounded-md bg-white border border-grey-200 font-semibold text-grey-800">
                             Yes
                           </div>
                         </div>
 
                         {/* Behavior Tracking Block */}
-                        <div className="p-2 rounded-xl bg-purple-50/40 border border-purple-100 space-y-1 text-[9px]">
+                        <div className="p-2.5 rounded-xl bg-purple-50/50 border border-purple-100 space-y-1.5 text-[9px]">
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-purple-950 truncate max-w-[130px]">
+                            <span className="font-bold text-purple-950 truncate max-w-[140px]">
                               {objectivesList[0]?.title || 'Aggression'}
                             </span>
-                            <span className="text-[7px] font-bold text-purple-700 bg-purple-100/80 px-1 py-0.2 rounded">
+                            <span className="text-[8px] font-bold text-purple-700 bg-purple-100 px-1.5 py-0.5 rounded">
                               ISP Objective
                             </span>
                           </div>
 
                           {behaviorMethod === 'abc' ? (
-                            <div className="grid grid-cols-2 gap-1 text-[8px] pt-0.5">
+                            <div className="grid grid-cols-2 gap-1.5 text-[9px] pt-1">
                               <div>
-                                <span className="text-grey-400 block">Incident time</span>
+                                <span className="text-grey-400 block text-[8px]">Incident time</span>
                                 <span className="font-semibold text-grey-800">9:15 AM</span>
                               </div>
                               <div>
-                                <span className="text-grey-400 block">Antecedent</span>
+                                <span className="text-grey-400 block text-[8px]">Antecedent</span>
                                 <span className="font-semibold text-grey-800 truncate block">Waiting</span>
                               </div>
                               <div>
-                                <span className="text-grey-400 block">Behavior</span>
+                                <span className="text-grey-400 block text-[8px]">Behavior</span>
                                 <span className="font-semibold text-grey-800 truncate block">Refused or turned away</span>
                               </div>
                               <div>
-                                <span className="text-grey-400 block">Consequence</span>
+                                <span className="text-grey-400 block text-[8px]">Consequence</span>
                                 <span className="font-semibold text-grey-800 truncate block">Staff redirected</span>
                               </div>
                             </div>
                           ) : (
-                            <div className="grid grid-cols-2 gap-1 text-[8px] pt-0.5">
+                            <div className="grid grid-cols-2 gap-1.5 text-[9px] pt-1">
                               <div>
-                                <span className="text-grey-400 block">Occurrence</span>
+                                <span className="text-grey-400 block text-[8px]">Occurrence</span>
                                 <span className="font-semibold text-grey-800">Occurred</span>
                               </div>
                               <div>
-                                <span className="text-grey-400 block">Severity level</span>
+                                <span className="text-grey-400 block text-[8px]">Severity level</span>
                                 <span className="font-semibold text-grey-800">1 · Mild</span>
                               </div>
                             </div>
@@ -4414,50 +4308,44 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
 
                         {/* Universal Tasks Block (if enabled) */}
                         {includeTasksInNote && (
-                          <div className="p-1.5 rounded-xl bg-grey-50 border border-grey-200 text-[8px] flex items-center justify-between">
-                            <span className="font-medium text-grey-700 truncate max-w-[120px]">
+                          <div className="p-2 rounded-xl bg-grey-50 border border-grey-200 text-[9px] flex items-center justify-between">
+                            <span className="font-medium text-grey-700 truncate max-w-[130px]">
                               {tasksList[0]?.name || 'Pay for an item'}
                             </span>
-                            <span className="font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                            <span className="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                               Mild assist
                             </span>
                           </div>
                         )}
                       </div>
+                    )}
 
-                      {/* ====================================================
-                          SECTION 4: Daily Note
-                      ==================================================== */}
-                      <div className={cn(
-                        "p-2.5 rounded-2xl border transition-all space-y-2",
-                        phoneAttendance === 'Absent' && "opacity-35 pointer-events-none select-none",
-                        activeNoteSection === 4
-                          ? "border-emerald-400 bg-emerald-50/20 ring-1 ring-emerald-400/30"
-                          : "border-grey-200 bg-white"
-                      )}>
-                        <div className="flex items-center justify-between">
-                          <b className="text-[10px] font-bold text-grey-900">4 · Daily Note</b>
-                          {activeNoteSection === 4 && (
-                            <span className="text-[8px] font-bold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.5 rounded-full">
-                              Editing
-                            </span>
-                          )}
+                    {/* ====================================================
+                        SECTION 4: Daily Note & Signature ONLY
+                    ==================================================== */}
+                    {activeNoteSection === 4 && (
+                      <div className="p-3 rounded-2xl border border-emerald-400 bg-white ring-1 ring-emerald-400/30 space-y-3 shadow-2xs animate-in fade-in duration-200">
+                        <div className="flex items-center justify-between pb-1.5 border-b border-grey-100">
+                          <b className="text-[11px] font-bold text-grey-900">Daily Note & Signature</b>
+                          <span className="text-[8px] font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">
+                            Active
+                          </span>
                         </div>
 
                         {/* Writing Prompt - DYNAMICALLY REFLECTS notePrompt */}
-                        <div className="space-y-1">
-                          <span className="text-grey-700 block text-[9px] font-medium leading-tight">
+                        <div className="space-y-1.5">
+                          <span className="text-grey-700 block text-[10px] font-medium leading-tight">
                             {notePrompt || 'Describe the day and client engagement.'}
                           </span>
                           <div className="relative">
                             <textarea
-                              rows={2}
+                              rows={3}
                               defaultValue="Client participated actively during morning and afternoon sessions with positive peer interaction."
-                              className="w-full p-1.5 pr-5 rounded-lg border border-grey-200 bg-grey-50 text-[9px] text-grey-900 focus:outline-none resize-none leading-relaxed"
+                              className="w-full p-2 pr-6 rounded-lg border border-grey-200 bg-grey-50 text-[10px] text-grey-900 focus:outline-none resize-none leading-relaxed"
                             />
                             {allowVoiceDictation && (
-                              <div className="absolute right-1.5 bottom-2 text-grey-400" title="Voice dictation enabled">
-                                <Sparkles className="w-2.5 h-2.5 text-purple-600" />
+                              <div className="absolute right-2 bottom-2 text-grey-400" title="Voice dictation enabled">
+                                <Sparkles className="w-3 h-3 text-purple-600" />
                               </div>
                             )}
                           </div>
@@ -4465,23 +4353,24 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
 
                         {/* Electronic Signature Block (Reflects requireSignature) */}
                         {requireSignature && (
-                          <div className="p-1.5 rounded-xl border border-emerald-200 bg-emerald-50/50 flex items-center justify-between text-[8px]">
+                          <div className="p-2 rounded-xl border border-emerald-200 bg-emerald-50/60 flex items-center justify-between text-[9px]">
                             <div>
                               <div className="font-bold text-emerald-950 italic">Reuben Stewart</div>
                               <div className="text-emerald-800">Verified Oct 5, 2026 · 12:02 PM</div>
                             </div>
-                            <Check className="w-3 h-3 text-emerald-700" />
+                            <Check className="w-3.5 h-3.5 text-emerald-700" />
                           </div>
                         )}
 
                         <button
                           type="button"
-                          className="w-full py-2 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-bold text-[10px] shadow-xs transition-colors cursor-pointer"
+                          className="w-full py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-bold text-[10px] shadow-xs transition-colors cursor-pointer"
                         >
                           Submit Daily Note
                         </button>
                       </div>
-                    </div>
+                    )}
+                  </div>
                 </MobilePhoneMockup>
               </div>
             </div>
@@ -4736,17 +4625,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                 >
                   <Play className="w-3 h-3 fill-current ml-0.5" />
                   <span>Watch lesson ({STEP_VIDEOS[step].duration})</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCompletionCelebration(true);
-                    Sound.fanfare();
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-colors cursor-pointer border border-emerald-300 shadow-2xs"
-                >
-                  <span>🎀 Cut the ribbon</span>
                 </button>
               </div>
             )}
