@@ -210,3 +210,4 @@ class ConfettiFX {
 }
 
 export const Confetti = new ConfettiFX();
+
