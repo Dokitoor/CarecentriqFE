@@ -1025,3 +1025,4 @@ export const FinaleCelebrationStage: React.FC<FinaleCelebrationStageProps> = ({
     </div>
   );
 };
+

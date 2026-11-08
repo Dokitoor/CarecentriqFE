@@ -35,6 +35,7 @@ import { VERIFIED_CARE_AVATARS, handleImageError } from '../lib/images';
 import { Sound } from '../utils/soundEffects';
 import { Confetti } from '../utils/confettiFx';
 import { FinaleCelebrationStage } from './FinaleCelebrationStage';
+import { MobilePhoneMockup } from './MobilePhoneMockup';
 
 // Exact artwork uploaded by user for Got a lot to add & Prefer to build it yourself (Next.js public paths)
 const objectiveFolderImg = '/objective-folder.png';
@@ -1183,7 +1184,7 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
             /* MANUAL OBJECTIVES BUILDER */
             <>
               <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-between overflow-y-auto">
-                <div className="space-y-6 max-w-3xl">
+                <div className="space-y-6 max-w-5xl">
                   {/* Header with back arrow right beside it */}
                   <div className="flex items-start gap-4 mb-6">
                     <button
@@ -1543,7 +1544,7 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
             /* MANUAL TRAININGS & ACTIVITIES BUILDER */
             <>
               <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-between overflow-y-auto">
-                <div className="space-y-6 max-w-3xl">
+                <div className="space-y-6 max-w-5xl">
                   {/* Header with back arrow right beside it */}
                   <div className="flex items-start gap-4 mb-6">
                     <button
@@ -1975,7 +1976,7 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
             /* MANUAL TASKS BUILDER (WITH PRESET TASKS AND CUSTOM TASK CREATOR) */
             <>
               <div className="flex-1 p-6 sm:p-10 lg:p-12 flex flex-col justify-between overflow-y-auto">
-                <div className="space-y-6 max-w-3xl">
+                <div className="space-y-6 max-w-5xl">
                   {/* Header with back arrow right beside it */}
                   <div className="flex items-start gap-4 mb-6">
                     <button
@@ -2190,15 +2191,14 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
         </div>
       )}
 
-{step === 'behavior' && (
-        <div className="flex-1 flex flex-col md:flex-row items-stretch min-h-screen">
+      {step === 'behavior' && (
+        <div className="flex-1 flex flex-col lg:flex-row items-stretch min-h-screen">
           {behaviorPage === 'choice' ? (
             /* ========================================================
-               PAGE 1: METHOD CHOICE (Matches media_1794171704733_86372634.jpg)
-               Only the 2 method choice cards are shown here.
+               PAGE 1: METHOD CHOICE (Clean, spacious, no unnecessary tags)
             ======================================================== */
             <>
-              <div className="flex-1 p-6 sm:p-8 lg:p-10 flex flex-col justify-between overflow-y-auto">
+              <div className="flex-1 min-w-0 p-6 sm:p-8 lg:p-10 flex flex-col justify-between overflow-y-auto">
                 <div className="space-y-6">
                   {/* Top Navigation & Header */}
                   <div className="flex items-start gap-4">
@@ -2224,8 +2224,8 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     </div>
                   </div>
 
-                  {/* 2 Method Cards Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 lg:gap-6 max-w-4xl pt-1">
+                  {/* 2 Method Cards Grid - Spacious, No Unnecessary Tags */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-5xl pt-1">
                     {/* Card 1: Use ABC Tracking */}
                     <div
                       onClick={() => {
@@ -2233,15 +2233,14 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                         setBehaviorPage('setup');
                       }}
                       className={cn(
-                        'p-5 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between group overflow-hidden bg-white shadow-xs',
+                        'p-6 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between group overflow-hidden bg-white shadow-xs',
                         behaviorMethod === 'abc'
                           ? 'border-[#2ee05a] ring-2 ring-[#2ee05a]/25 shadow-sm'
                           : 'border-grey-200 hover:border-grey-300'
                       )}
                     >
-                      <div className="space-y-3.5">
-                        {/* Illustration Container */}
-                        <div className="w-full h-40 sm:h-44 rounded-2xl bg-[#FAFAFC] border border-grey-100/90 overflow-hidden flex items-center justify-center p-3 transition-transform group-hover:scale-[1.01]">
+                      <div className="space-y-4">
+                        <div className="w-full h-44 sm:h-48 rounded-2xl bg-[#FAFAFC] border border-grey-100/90 overflow-hidden flex items-center justify-center p-3 transition-transform group-hover:scale-[1.01]">
                           <img
                             src={behaviorAbcImg}
                             alt="ABC Tracking Character Group"
@@ -2249,23 +2248,17 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                           />
                         </div>
 
-                        <div>
-                          <div className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-wide border border-emerald-200 mb-1.5">
-                            Behavioral Data - ABC
-                          </div>
-                          <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
+                        <div className="space-y-1.5">
+                          <h3 className="font-bold text-lg text-grey-900 tracking-tight">
                             Use ABC Tracking
                           </h3>
-                          <p className="text-xs text-grey-500 leading-relaxed mt-1">
+                          <p className="text-xs text-grey-600 leading-relaxed">
                             Record Antecedent, Behavior, and Consequence for each incident with consistent preset choices.
                           </p>
-                          <div className="mt-2 text-[11px] font-semibold text-emerald-700 bg-emerald-50/60 px-2.5 py-1 rounded-lg border border-emerald-100 inline-block">
-                            Antecedent → Behavior → Consequence
-                          </div>
                         </div>
                       </div>
 
-                      <div className="pt-5">
+                      <div className="pt-6">
                         <button
                           type="button"
                           onClick={(e) => {
@@ -2287,15 +2280,14 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                         setBehaviorPage('setup');
                       }}
                       className={cn(
-                        'p-5 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between group overflow-hidden bg-white shadow-xs',
+                        'p-6 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between group overflow-hidden bg-white shadow-xs',
                         behaviorMethod === 'custom'
                           ? 'border-[#2ee05a] ring-2 ring-[#2ee05a]/25 shadow-sm'
                           : 'border-grey-200 hover:border-grey-300'
                       )}
                     >
-                      <div className="space-y-3.5">
-                        {/* Illustration Container */}
-                        <div className="w-full h-40 sm:h-44 rounded-2xl bg-[#FAFAFC] border border-grey-100/90 overflow-hidden flex items-center justify-center p-3 transition-transform group-hover:scale-[1.01]">
+                      <div className="space-y-4">
+                        <div className="w-full h-44 sm:h-48 rounded-2xl bg-[#FAFAFC] border border-grey-100/90 overflow-hidden flex items-center justify-center p-3 transition-transform group-hover:scale-[1.01]">
                           <img
                             src={behaviorCustomImg}
                             alt="Custom Build Characters"
@@ -2303,23 +2295,17 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                           />
                         </div>
 
-                        <div>
-                          <div className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-wide border border-emerald-200 mb-1.5">
-                            Choose your measurements
-                          </div>
-                          <h3 className="font-bold text-base sm:text-lg text-grey-900 tracking-tight">
+                        <div className="space-y-1.5">
+                          <h3 className="font-bold text-lg text-grey-900 tracking-tight">
                             Build Your Measurements
                           </h3>
-                          <p className="text-xs text-grey-500 leading-relaxed mt-1">
+                          <p className="text-xs text-grey-600 leading-relaxed">
                             Set severity levels. Staff record each incident with its own severity and explanation; choose whether to include duration.
                           </p>
-                          <div className="mt-2 text-[11px] font-semibold text-emerald-700 bg-emerald-50/60 px-2.5 py-1 rounded-lg border border-emerald-100 inline-block">
-                            Severity · Count · Duration
-                          </div>
                         </div>
                       </div>
 
-                      <div className="pt-5">
+                      <div className="pt-6">
                         <button
                           type="button"
                           onClick={(e) => {
@@ -2336,7 +2322,7 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                   </div>
 
                   {/* Informational Callout */}
-                  <div className="p-3.5 rounded-2xl bg-grey-50/80 border border-grey-200/80 text-xs text-grey-600 flex items-start gap-2.5 max-w-4xl">
+                  <div className="p-4 rounded-2xl bg-grey-50/80 border border-grey-200/80 text-xs text-grey-600 flex items-start gap-2.5 max-w-5xl">
                     <Info className="w-4 h-4 text-grey-500 shrink-0 mt-0.5" />
                     <p>
                       Both methods use each client’s assigned ISP Objectives. Your choice decides the behavior fields within Activity & Progress. The four note sections stay the same.
@@ -2367,40 +2353,62 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                 </div>
               </div>
 
-              {/* Right Side: Informational Context Panel */}
-              <div className="w-full md:w-[380px] lg:w-[420px] bg-[#FCECE7] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-orange-100">
-                <div className="space-y-6 z-10">
-                  {renderStepProgressPills(4)}
+              {/* Right Side: Consistent Grey Supporting Preview Area with Mobile Phone Mockup */}
+              <div className="w-[390px] lg:w-[430px] xl:w-[460px] bg-[#EEF0F3] p-5 lg:p-6 border-l border-grey-200/90 flex flex-col justify-start shrink-0 select-none overflow-y-auto">
+                <div className="space-y-3.5 max-w-[325px] mx-auto w-full">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-bold text-sm text-grey-900">Staff phone preview</h3>
+                      <p className="text-[11px] text-grey-500 mt-0.5">
+                        Real-time mobile preview
+                      </p>
+                    </div>
+                    {renderStepProgressPills(4)}
+                  </div>
 
-                  <div className="p-6 rounded-3xl bg-white shadow-2xs border border-white/80 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-bold text-sm text-grey-900">
-                        What is behavior measurement?
-                      </h4>
-                      <div className="w-7 h-7 rounded-lg bg-orange-100 flex items-center justify-center text-orange-700">
-                        <Folder className="w-4 h-4" />
+                  <MobilePhoneMockup
+                    title="Behavior Tracking"
+                    subtitle="Joe Doe · October 5, 2026"
+                    badge="Staff view"
+                  >
+                    <div className="space-y-3 text-xs font-sans">
+                      <div className="p-3 rounded-2xl bg-emerald-50/60 border border-emerald-200/60 space-y-1">
+                        <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">
+                          Shift Observation
+                        </span>
+                        <p className="text-[11px] text-emerald-950 font-medium leading-relaxed">
+                          Staff track behavioral observations directly on their phones. Select either ABC Tracking or Custom Measurements on the left to configure.
+                        </p>
+                      </div>
+
+                      <div className="p-3 rounded-2xl border border-grey-200 bg-white space-y-2">
+                        <div className="flex items-center justify-between">
+                          <b className="text-[11px] font-bold text-grey-900">Incident · 9:15 AM</b>
+                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                            Logged
+                          </span>
+                        </div>
+                        <div className="text-[10px] space-y-1 text-grey-700">
+                          <div><span className="text-grey-400">Behavior:</span> <b className="text-grey-900">Aggression</b></div>
+                          <div><span className="text-grey-400">Antecedent:</span> Waiting</div>
+                          <div><span className="text-grey-400">Action:</span> Refused or turned away</div>
+                          <div><span className="text-grey-400">Consequence:</span> Staff redirected</div>
+                        </div>
                       </div>
                     </div>
-                    <p className="text-xs text-grey-600 leading-relaxed">
-                      Measurement settings define how staff record observations. Choose one tracking method for this configuration. Both methods use each client's assigned ISP Objectives
-                    </p>
-                  </div>
-                </div>
-
-                <div className="pt-8 text-xs text-emerald-800 italic text-right z-10 font-medium">
-                  Your choice carries into staff Daily Notes.
+                  </MobilePhoneMockup>
                 </div>
               </div>
             </>
           ) : (
             /* ========================================================
-               PAGE 2: DETAILED SETUP & LIVE TEST LOGGER
-               (Shown on a separate page after user picks ABC or Custom)
+               PAGE 2: INSTRUCTIONAL PROVIDER SETUP & REAL-TIME PHONE PREVIEW
             ======================================================== */
             <>
-              <div className="flex-1 p-6 sm:p-8 lg:p-10 flex flex-col justify-between overflow-y-auto">
+              {/* LEFT COLUMN: INSTRUCTIONAL PROVIDER SETUP (Spacious, No Unnecessary Tags) */}
+              <div className="flex-1 min-w-0 p-6 sm:p-8 lg:p-10 flex flex-col justify-between overflow-y-auto">
                 <div className="space-y-6">
-                  {/* Top Navigation & Header for Setup Page */}
+                  {/* Top Navigation & Header */}
                   <div className="flex items-start gap-4">
                     <button
                       type="button"
@@ -2412,9 +2420,6 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                     </button>
 
                     <div className="space-y-1">
-                      <div className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-wide border border-emerald-200 mb-1">
-                        {behaviorMethod === 'abc' ? 'Behavioral Data - ABC' : 'Custom measurements'}
-                      </div>
                       <h1 className="font-sans font-bold text-2xl sm:text-3xl text-grey-900 tracking-tight">
                         {behaviorMethod === 'abc' ? 'Set up ABC Tracking' : 'Build Your Measurements'}
                       </h1>
@@ -2428,526 +2433,162 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
 
                   {/* Setup Content: ABC vs Custom */}
                   {behaviorMethod === 'abc' ? (
-                    <div className="space-y-6 max-w-4xl pt-1 animate-in fade-in duration-200">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Provider Setup Panel */}
-                        <div className="p-6 rounded-3xl bg-white border border-grey-200/90 shadow-2xs space-y-5">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-bold text-sm sm:text-base text-grey-900">Provider setup</h4>
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
-                                Preset Choices
-                              </span>
-                            </div>
-                            <p className="text-xs text-grey-500 mt-1 leading-relaxed">
-                              Staff select consistent answers instead of typing descriptions. "Consequence" does not mean punishment.
-                            </p>
+                    <div className="p-6 rounded-3xl bg-white border border-grey-200/90 shadow-2xs space-y-6 animate-in fade-in duration-200">
+                      <div>
+                        <h4 className="font-bold text-base text-grey-900">Provider setup</h4>
+                        <p className="text-xs text-grey-500 mt-1 leading-relaxed">
+                          Staff select consistent answers instead of typing descriptions. Antecedent, Behavior, and Consequence choices configure what appears in the mobile staff app.
+                        </p>
+                      </div>
+
+                      {/* 3 Columns of ABC choices - Full Width, No Truncate! */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5">
+                        <div className="p-4 rounded-2xl bg-grey-50/80 border border-grey-200/80 space-y-3">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                            <b className="text-xs text-grey-900 font-bold">A · Antecedent</b>
                           </div>
-
-                          {/* 3 Columns of ABC choices */}
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div className="p-3 rounded-2xl bg-grey-50/70 border border-grey-200/70 space-y-2">
-                              <b className="text-xs text-grey-900 block font-bold">A · Antecedent</b>
-                              <ul className="text-[11px] text-grey-600 space-y-1">
-                                {['Activity requested', 'Activity ending', 'Waiting', 'Item unavailable', 'Peer interaction', 'Loud noise'].map((item) => (
-                                  <li key={item} className="flex items-center gap-1.5 truncate">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                                    <span>{item}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-
-                            <div className="p-3 rounded-2xl bg-grey-50/70 border border-grey-200/70 space-y-2">
-                              <b className="text-xs text-grey-900 block font-bold">B · Behavior</b>
-                              <ul className="text-[11px] text-grey-600 space-y-1">
-                                {['Yelled or raised voice', 'Hit, kicked or pushed', 'Threw an item', 'Refused or turned away', 'Left the area'].map((item) => (
-                                  <li key={item} className="flex items-center gap-1.5 truncate">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-                                    <span>{item}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-
-                            <div className="p-3 rounded-2xl bg-grey-50/70 border border-grey-200/70 space-y-2">
-                              <b className="text-xs text-grey-900 block font-bold">C · Consequence</b>
-                              <ul className="text-[11px] text-grey-600 space-y-1">
-                                {['Staff offered a break', 'Activity paused', 'Staff redirected', 'Peer moved away', 'Activity continued', 'No observed change'].map((item) => (
-                                  <li key={item} className="flex items-center gap-1.5 truncate">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                                    <span>{item}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          </div>
-
-                          {/* Toggles for Incident Duration & Location */}
-                          <div className="space-y-3 pt-2 border-t border-grey-100">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <span className="font-bold text-xs text-grey-900 block">Incident duration</span>
-                                <small className="text-[11px] text-grey-500">Minutes for each recorded incident.</small>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => setAbcDuration(!abcDuration)}
-                                className={cn(
-                                  'w-10 h-6 rounded-full flex items-center px-0.5 transition-colors cursor-pointer shrink-0',
-                                  abcDuration ? 'bg-[#2ee05a] justify-end' : 'bg-grey-300 justify-start'
-                                )}
-                              >
-                                <div className="w-5 h-5 rounded-full bg-white shadow-xs" />
-                              </button>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <span className="font-bold text-xs text-grey-900 block">Location</span>
-                                <small className="text-[11px] text-grey-500">Where each incident happened.</small>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => setAbcLocation(!abcLocation)}
-                                className={cn(
-                                  'w-10 h-6 rounded-full flex items-center px-0.5 transition-colors cursor-pointer shrink-0',
-                                  abcLocation ? 'bg-[#2ee05a] justify-end' : 'bg-grey-300 justify-start'
-                                )}
-                              >
-                                <div className="w-5 h-5 rounded-full bg-white shadow-xs" />
-                              </button>
-                            </div>
-                          </div>
+                          <ul className="text-xs text-grey-700 space-y-2">
+                            {['Activity requested', 'Activity ending', 'Waiting', 'Item unavailable', 'Peer interaction', 'Loud noise'].map((item) => (
+                              <li key={item} className="flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
+                                <span className="leading-snug">{item}</span>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
 
-                        {/* Try it as Staff: Live Interactive Incident Logger */}
-                        <div className="p-6 rounded-3xl bg-white border border-grey-200/90 shadow-2xs space-y-4">
+                        <div className="p-4 rounded-2xl bg-grey-50/80 border border-grey-200/80 space-y-3">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+                            <b className="text-xs text-grey-900 font-bold">B · Behavior</b>
+                          </div>
+                          <ul className="text-xs text-grey-700 space-y-2">
+                            {['Yelled or raised voice', 'Hit, kicked or pushed', 'Threw an item', 'Refused or turned away', 'Left the area'].map((item) => (
+                              <li key={item} className="flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
+                                <span className="leading-snug">{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div className="p-4 rounded-2xl bg-grey-50/80 border border-grey-200/80 space-y-3">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                            <b className="text-xs text-grey-900 font-bold">C · Consequence</b>
+                          </div>
+                          <ul className="text-xs text-grey-700 space-y-2">
+                            {['Staff offered a break', 'Activity paused', 'Staff redirected', 'Peer moved away', 'Activity continued', 'No observed change'].map((item) => (
+                              <li key={item} className="flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 shrink-0" />
+                                <span className="leading-snug">{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* Toggles for Incident Duration & Location */}
+                      <div className="space-y-4 pt-4 border-t border-grey-100">
+                        <div className="flex items-center justify-between">
                           <div>
-                            <div className="flex items-center justify-between">
-                              <h4 className="font-bold text-sm sm:text-base text-grey-900">
-                                Try it as staff: record one incident
-                              </h4>
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200">
-                                Live Test
-                              </span>
-                            </div>
-                            <p className="text-xs text-grey-500 mt-1">
-                              Turn options on or off and test the sample logging.
-                            </p>
+                            <div className="font-semibold text-xs text-grey-900">Incident duration</div>
+                            <div className="text-[11px] text-grey-500">Minutes for each recorded incident.</div>
                           </div>
-
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="space-y-1">
-                              <label className="text-[11px] font-semibold text-grey-700">Assigned behavior</label>
-                              <select
-                                value={draftBehavior}
-                                onChange={(e) => setDraftBehavior(e.target.value)}
-                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                              >
-                                <option value="Aggression">Aggression</option>
-                                <option value="Activity Refusal">Activity Refusal</option>
-                                <option value="Verbal aggression">Verbal aggression</option>
-                                {objectivesList.map((obj) => (
-                                  <option key={obj.id} value={obj.title}>{obj.title}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div className="space-y-1">
-                              <label className="text-[11px] font-semibold text-grey-700">Incident time</label>
-                              <select
-                                value={draftTime}
-                                onChange={(e) => setDraftTime(e.target.value)}
-                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                              >
-                                <option value="9:15 AM">9:15 AM</option>
-                                <option value="10:30 AM">10:30 AM</option>
-                                <option value="1:45 PM">1:45 PM</option>
-                                <option value="3:00 PM">3:00 PM</option>
-                              </select>
-                            </div>
-
-                            <div className="space-y-1">
-                              <label className="text-[11px] font-semibold text-grey-700">A · Antecedent</label>
-                              <select
-                                value={draftAntecedent}
-                                onChange={(e) => setDraftAntecedent(e.target.value)}
-                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                              >
-                                {['Activity requested', 'Activity ending', 'Waiting', 'Item unavailable', 'Peer interaction', 'Loud noise'].map((a) => (
-                                  <option key={a} value={a}>{a}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div className="space-y-1">
-                              <label className="text-[11px] font-semibold text-grey-700">B · Behavior</label>
-                              <select
-                                value={draftBehaviorChoice}
-                                onChange={(e) => setDraftBehaviorChoice(e.target.value)}
-                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                              >
-                                {['Yelled or raised voice', 'Hit, kicked or pushed', 'Threw an item', 'Refused or turned away', 'Left the area'].map((b) => (
-                                  <option key={b} value={b}>{b}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div className={cn('space-y-1', !abcDuration && !abcLocation ? 'sm:col-span-2' : '')}>
-                              <label className="text-[11px] font-semibold text-grey-700">C · Consequence</label>
-                              <select
-                                value={draftConsequence}
-                                onChange={(e) => setDraftConsequence(e.target.value)}
-                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                              >
-                                {['Staff offered a break', 'Activity paused', 'Staff redirected', 'Peer moved away', 'Activity continued', 'No observed change'].map((c) => (
-                                  <option key={c} value={c}>{c}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            {abcDuration && (
-                              <div className="space-y-1">
-                                <label className="text-[11px] font-semibold text-grey-700">Incident duration · minutes</label>
-                                <input
-                                  type="number"
-                                  min="1"
-                                  value={draftDurationMins}
-                                  onChange={(e) => setDraftDurationMins(e.target.value)}
-                                  className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none"
-                                />
-                              </div>
+                          <button
+                            type="button"
+                            onClick={() => setAbcDuration(!abcDuration)}
+                            className={cn(
+                              'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out',
+                              abcDuration ? 'bg-[#2ee05a]' : 'bg-grey-200'
                             )}
+                          >
+                            <span
+                              className={cn(
+                                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                                abcDuration ? 'translate-x-5' : 'translate-x-0'
+                              )}
+                            />
+                          </button>
+                        </div>
 
-                            {abcLocation && (
-                              <div className="space-y-1 sm:col-span-2">
-                                <label className="text-[11px] font-semibold text-grey-700">Location</label>
-                                <select
-                                  value={draftLocation}
-                                  onChange={(e) => setDraftLocation(e.target.value)}
-                                  className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                                >
-                                  {['Community park', 'Program site', 'Vehicle', 'Community venue', 'Not observed / Unknown'].map((l) => (
-                                    <option key={l} value={l}>{l}</option>
-                                  ))}
-                                </select>
-                              </div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-semibold text-xs text-grey-900">Location</div>
+                            <div className="text-[11px] text-grey-500">Where each incident happened.</div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setAbcLocation(!abcLocation)}
+                            className={cn(
+                              'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out',
+                              abcLocation ? 'bg-[#2ee05a]' : 'bg-grey-200'
                             )}
-                          </div>
-
-                          <div className="flex items-center justify-between pt-2">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const newInc = {
-                                  id: `inc-${Date.now()}`,
-                                  time: draftTime,
-                                  behavior: draftBehavior,
-                                  a: draftAntecedent,
-                                  b: draftBehaviorChoice,
-                                  c: draftConsequence,
-                                  dur: abcDuration ? `${draftDurationMins} mins` : undefined,
-                                  loc: abcLocation ? draftLocation : undefined,
-                                };
-                                setIncidentLog((prev) => [newInc, ...prev]);
-                                setIncidentFeedback('ABC entry saved in this example.');
-                                setTimeout(() => setIncidentFeedback(null), 3000);
-                              }}
-                              className="px-4 py-2 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors cursor-pointer shadow-xs"
-                            >
-                              Save incident
-                            </button>
-                            {incidentFeedback && (
-                              <span className="text-xs font-bold text-emerald-600 animate-in fade-in">
-                                ✓ {incidentFeedback}
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Logged Incidents Table */}
-                          <div className="pt-2 border-t border-grey-100">
-                            <div className="text-[11px] font-bold text-grey-500 uppercase tracking-wider mb-2">
-                              Logged Incidents ({incidentLog.length})
-                            </div>
-                            <div className="overflow-x-auto max-h-36 overflow-y-auto border border-grey-200 rounded-xl">
-                              <table className="w-full text-left text-[11px] text-grey-800">
-                                <thead className="bg-grey-50 border-b border-grey-200 text-grey-600 font-semibold">
-                                  <tr>
-                                    <th className="p-2">Behavior</th>
-                                    <th className="p-2">A</th>
-                                    <th className="p-2">B</th>
-                                    <th className="p-2">C</th>
-                                    {(abcDuration || abcLocation) && <th className="p-2">Details</th>}
-                                  </tr>
-                                </thead>
-                                <tbody className="divide-y divide-grey-100">
-                                  {incidentLog.map((row) => (
-                                    <tr key={row.id} className="hover:bg-grey-50/50">
-                                      <td className="p-2 font-medium">
-                                        {row.behavior}
-                                        <span className="block text-[10px] text-grey-400">{row.time}</span>
-                                      </td>
-                                      <td className="p-2 text-grey-600">{row.a || '—'}</td>
-                                      <td className="p-2 text-grey-600">{row.b || '—'}</td>
-                                      <td className="p-2 text-grey-600">{row.c || '—'}</td>
-                                      {(abcDuration || abcLocation) && (
-                                        <td className="p-2 text-grey-500 text-[10px]">
-                                          {row.dur && <span className="mr-1">{row.dur}</span>}
-                                          {row.loc && <span>({row.loc})</span>}
-                                        </td>
-                                      )}
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
+                          >
+                            <span
+                              className={cn(
+                                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                                abcLocation ? 'translate-x-5' : 'translate-x-0'
+                              )}
+                            />
+                          </button>
                         </div>
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-6 max-w-4xl pt-1 animate-in fade-in duration-200">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Provider Setup Panel: Severity & Settings */}
-                        <div className="p-6 rounded-3xl bg-white border border-grey-200/90 shadow-2xs space-y-5">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-bold text-sm sm:text-base text-grey-900">Provider setup</h4>
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-50 text-purple-800 border border-purple-200">
-                                Custom Severity
-                              </span>
-                            </div>
-                            <p className="text-xs text-grey-500 mt-1 leading-relaxed">
-                              Define severity criteria for incidents and configure tracking fields.
-                            </p>
-                          </div>
+                    <div className="p-6 rounded-3xl bg-white border border-grey-200/90 shadow-2xs space-y-6 animate-in fade-in duration-200">
+                      <div>
+                        <h4 className="font-bold text-base text-grey-900">Provider setup</h4>
+                        <p className="text-xs text-grey-500 mt-1 leading-relaxed">
+                          Define severity criteria for incidents and configure tracking fields.
+                        </p>
+                      </div>
 
-                          {/* 3 Severity Cards */}
-                          <div className="space-y-2.5">
-                            <div className="p-3 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 flex items-start justify-between gap-3">
-                              <div>
-                                <b className="text-xs text-emerald-950 font-bold block">1 · Mild</b>
-                                <p className="text-[11px] text-emerald-800 mt-0.5">Easy to redirect.</p>
-                              </div>
-                              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md">
-                                Level 1
-                              </span>
-                            </div>
-
-                            <div className="p-3 rounded-2xl bg-amber-50/50 border border-amber-200/80 flex items-start justify-between gap-3">
-                              <div>
-                                <b className="text-xs text-amber-950 font-bold block">2 · Moderate</b>
-                                <p className="text-[11px] text-amber-800 mt-0.5">Difficult to redirect.</p>
-                              </div>
-                              <span className="text-[10px] font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-md">
-                                Level 2
-                              </span>
-                            </div>
-
-                            <div className="p-3 rounded-2xl bg-rose-50/50 border border-rose-200/80 flex items-start justify-between gap-3">
-                              <div>
-                                <b className="text-xs text-rose-950 font-bold block">3 · Severe</b>
-                                <p className="text-[11px] text-rose-800 mt-0.5">Staff assistance needed for safety.</p>
-                              </div>
-                              <span className="text-[10px] font-bold text-rose-700 bg-rose-100/80 px-2 py-0.5 rounded-md">
-                                Level 3
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Settings Rows */}
-                          <div className="space-y-3 pt-2 border-t border-grey-100">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <span className="font-bold text-xs text-grey-900 block">Multiple incidents</span>
-                                <small className="text-[11px] text-grey-500">Choose between a count or one entry per incident.</small>
-                              </div>
-                              <span className="text-[10px] font-bold text-grey-600 bg-grey-100 px-2 py-1 rounded-md">
-                                Always included
-                              </span>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <span className="font-bold text-xs text-grey-900 block">Incident duration</span>
-                                <small className="text-[11px] text-grey-500">Minutes for each recorded incident.</small>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => setCustomDuration(!customDuration)}
-                                className={cn(
-                                  'w-10 h-6 rounded-full flex items-center px-0.5 transition-colors cursor-pointer shrink-0',
-                                  customDuration ? 'bg-[#2ee05a] justify-end' : 'bg-grey-300 justify-start'
-                                )}
-                              >
-                                <div className="w-5 h-5 rounded-full bg-white shadow-xs" />
-                              </button>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <span className="font-bold text-xs text-grey-900 block">Explain behavior incident</span>
-                                <small className="text-[11px] text-grey-500">Appears when an occurrence is recorded.</small>
-                              </div>
-                              <span className="text-[10px] font-bold text-grey-600 bg-grey-100 px-2 py-1 rounded-md">
-                                Always included
-                              </span>
-                            </div>
-                          </div>
+                      {/* 3 Severity Cards */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 space-y-1">
+                          <b className="text-xs text-emerald-950 font-bold block">1 · Mild</b>
+                          <p className="text-[11px] text-emerald-800">Easy to redirect.</p>
                         </div>
 
-                        {/* Try it as Staff: Live Interactive Incident Logger for Custom */}
-                        <div className="p-6 rounded-3xl bg-white border border-grey-200/90 shadow-2xs space-y-4">
-                          <div>
-                            <div className="flex items-center justify-between">
-                              <h4 className="font-bold text-sm sm:text-base text-grey-900">
-                                Try it as staff: record one incident
-                              </h4>
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200">
-                                Live Test
-                              </span>
-                            </div>
-                            <p className="text-xs text-grey-500 mt-1">
-                              Turn options on or off and test the sample logging.
-                            </p>
-                          </div>
-
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="space-y-1">
-                              <label className="text-[11px] font-semibold text-grey-700">Assigned behavior</label>
-                              <select
-                                value={draftBehavior}
-                                onChange={(e) => setDraftBehavior(e.target.value)}
-                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                              >
-                                <option value="Aggression">Aggression</option>
-                                <option value="Activity Refusal">Activity Refusal</option>
-                                <option value="Verbal aggression">Verbal aggression</option>
-                                {objectivesList.map((obj) => (
-                                  <option key={obj.id} value={obj.title}>{obj.title}</option>
-                                ))}
-                              </select>
-                            </div>
-
-                            <div className="space-y-1">
-                              <label className="text-[11px] font-semibold text-grey-700">Occurrence status</label>
-                              <select
-                                value={draftOccurrence}
-                                onChange={(e) => setDraftOccurrence(e.target.value as 'Occurred' | 'No occurrence')}
-                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                              >
-                                <option value="Occurred">Occurred</option>
-                                <option value="No occurrence">No occurrence</option>
-                              </select>
-                            </div>
-
-                            <div className={cn('space-y-1', !customDuration ? 'sm:col-span-2' : '')}>
-                              <label className="text-[11px] font-semibold text-grey-700">Severity level</label>
-                              <select
-                                value={draftSeverity}
-                                onChange={(e) => setDraftSeverity(e.target.value)}
-                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none cursor-pointer"
-                              >
-                                <option value="1 · Mild">1 · Mild (Easy to redirect)</option>
-                                <option value="2 · Moderate">2 · Moderate (Difficult to redirect)</option>
-                                <option value="3 · Severe">3 · Severe (Safety assistance)</option>
-                              </select>
-                            </div>
-
-                            {customDuration && (
-                              <div className="space-y-1">
-                                <label className="text-[11px] font-semibold text-grey-700">Incident duration · minutes</label>
-                                <input
-                                  type="number"
-                                  min="1"
-                                  value={draftDurationMins}
-                                  onChange={(e) => setDraftDurationMins(e.target.value)}
-                                  className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none"
-                                />
-                              </div>
-                            )}
-
-                            <div className="space-y-1 sm:col-span-2">
-                              <label className="text-[11px] font-semibold text-grey-700">Explain behavior incident</label>
-                              <textarea
-                                rows={2}
-                                value={draftExplanation}
-                                onChange={(e) => setDraftExplanation(e.target.value)}
-                                placeholder="Describe the incident and response…"
-                                className="w-full px-2.5 py-1.5 rounded-xl border border-grey-300 bg-white text-xs font-medium text-grey-900 focus:outline-none resize-none"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="flex items-center justify-between pt-2">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const newInc = {
-                                  id: `inc-${Date.now()}`,
-                                  time: draftTime,
-                                  behavior: draftBehavior,
-                                  occ: draftOccurrence,
-                                  sev: draftOccurrence === 'Occurred' ? draftSeverity : 'None',
-                                  dur: customDuration ? `${draftDurationMins} mins` : undefined,
-                                  notes: draftExplanation,
-                                };
-                                setIncidentLog((prev) => [newInc, ...prev]);
-                                setIncidentFeedback('Incident saved in this example.');
-                                setTimeout(() => setIncidentFeedback(null), 3000);
-                              }}
-                              className="px-4 py-2 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors cursor-pointer shadow-xs"
-                            >
-                              Save incident
-                            </button>
-                            {incidentFeedback && (
-                              <span className="text-xs font-bold text-emerald-600 animate-in fade-in">
-                                ✓ {incidentFeedback}
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Logged Incidents Table */}
-                          <div className="pt-2 border-t border-grey-100">
-                            <div className="text-[11px] font-bold text-grey-500 uppercase tracking-wider mb-2">
-                              Logged Incidents ({incidentLog.length})
-                            </div>
-                            <div className="overflow-x-auto max-h-36 overflow-y-auto border border-grey-200 rounded-xl">
-                              <table className="w-full text-left text-[11px] text-grey-800">
-                                <thead className="bg-grey-50 border-b border-grey-200 text-grey-600 font-semibold">
-                                  <tr>
-                                    <th className="p-2">Behavior</th>
-                                    <th className="p-2">Status</th>
-                                    <th className="p-2">Severity</th>
-                                    <th className="p-2">Notes</th>
-                                  </tr>
-                                </thead>
-                                <tbody className="divide-y divide-grey-100">
-                                  {incidentLog.map((row) => (
-                                    <tr key={row.id} className="hover:bg-grey-50/50">
-                                      <td className="p-2 font-medium">
-                                        {row.behavior}
-                                        <span className="block text-[10px] text-grey-400">{row.time}</span>
-                                      </td>
-                                      <td className="p-2 text-grey-600">{row.occ || 'Occurred'}</td>
-                                      <td className="p-2 text-grey-600">{row.sev || '—'}</td>
-                                      <td className="p-2 text-grey-500 text-[10px] max-w-[140px] truncate">
-                                        {row.notes || '—'}
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
+                        <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/80 space-y-1">
+                          <b className="text-xs text-amber-950 font-bold block">2 · Moderate</b>
+                          <p className="text-[11px] text-amber-800">Difficult to redirect.</p>
                         </div>
+
+                        <div className="p-4 rounded-2xl bg-rose-50/50 border border-rose-200/80 space-y-1">
+                          <b className="text-xs text-rose-950 font-bold block">3 · Severe</b>
+                          <p className="text-[11px] text-rose-800">Safety assistance required.</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-grey-100">
+                        <div>
+                          <div className="font-semibold text-xs text-grey-900">Incident duration</div>
+                          <div className="text-[11px] text-grey-500">Record minutes for each incident.</div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setCustomDuration(!customDuration)}
+                          className={cn(
+                            'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out',
+                            customDuration ? 'bg-[#2ee05a]' : 'bg-grey-200'
+                          )}
+                        >
+                          <span
+                            className={cn(
+                              'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                              customDuration ? 'translate-x-5' : 'translate-x-0'
+                            )}
+                          />
+                        </button>
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* Bottom Actions for Setup Page */}
+                {/* Bottom Navigation */}
                 <div className="mt-8 pt-4 flex items-center justify-between border-t border-grey-100">
                   <button
                     type="button"
@@ -2972,30 +2613,260 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                 </div>
               </div>
 
-              {/* Right Side: Informational Context Panel */}
-              <div className="w-full md:w-[380px] lg:w-[420px] bg-[#FCECE7] p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden border-l border-orange-100">
-                <div className="space-y-6 z-10">
-                  {renderStepProgressPills(4)}
+              {/* RIGHT COLUMN: SUPPORTING GREY PREVIEW AREA WITH REAL MOBILE PHONE MOCKUP */}
+              <div className="w-[390px] lg:w-[430px] xl:w-[460px] bg-[#EEF0F3] p-5 lg:p-6 border-l border-grey-200/90 flex flex-col justify-start shrink-0 select-none overflow-y-auto">
+                <div className="space-y-3.5 max-w-[325px] mx-auto w-full">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-bold text-sm text-grey-900">Staff phone preview</h3>
+                      <p className="text-[11px] text-grey-500 mt-0.5">
+                        Real-time mobile view · Test incident logging
+                      </p>
+                    </div>
+                    {renderStepProgressPills(4)}
+                  </div>
 
-                  <div className="p-6 rounded-3xl bg-white shadow-2xs border border-white/80 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-bold text-sm text-grey-900">
-                        {behaviorMethod === 'abc' ? 'About ABC Tracking' : 'About Severity Levels'}
-                      </h4>
-                      <div className="w-7 h-7 rounded-lg bg-orange-100 flex items-center justify-center text-orange-700">
-                        <Folder className="w-4 h-4" />
+                  <MobilePhoneMockup
+                    title="Behavior Incident"
+                    subtitle="Joe Doe · October 5, 2026"
+                    badge="Staff view"
+                  >
+                    <div className="space-y-3 text-xs font-sans">
+                      {/* Interactive Incident Form */}
+                      <div className="p-3 rounded-2xl bg-white border border-grey-200 space-y-2.5 shadow-2xs">
+                        <div className="flex items-center justify-between border-b border-grey-100 pb-1.5">
+                          <b className="text-[11px] font-bold text-grey-900">Record New Incident</b>
+                          <span className="text-[8px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
+                            Test Log
+                          </span>
+                        </div>
+
+                        <div className="space-y-2 text-[10px]">
+                          <div>
+                            <label className="text-grey-600 block mb-0.5 font-medium">Assigned behavior</label>
+                            <select
+                              value={draftBehavior}
+                              onChange={(e) => setDraftBehavior(e.target.value)}
+                              className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                            >
+                              <option value="Aggression">Aggression</option>
+                              <option value="Activity Refusal">Activity Refusal</option>
+                              <option value="Verbal aggression">Verbal aggression</option>
+                              {objectivesList.map((obj) => (
+                                <option key={obj.id} value={obj.title}>{obj.title}</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="text-grey-600 block mb-0.5 font-medium">Incident time</label>
+                            <select
+                              value={draftTime}
+                              onChange={(e) => setDraftTime(e.target.value)}
+                              className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                            >
+                              <option value="9:15 AM">9:15 AM</option>
+                              <option value="10:30 AM">10:30 AM</option>
+                              <option value="1:45 PM">1:45 PM</option>
+                              <option value="3:00 PM">3:00 PM</option>
+                            </select>
+                          </div>
+
+                          {behaviorMethod === 'abc' ? (
+                            <>
+                              <div>
+                                <label className="text-grey-600 block mb-0.5 font-medium">A · Antecedent</label>
+                                <select
+                                  value={draftAntecedent}
+                                  onChange={(e) => setDraftAntecedent(e.target.value)}
+                                  className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                                >
+                                  <option value="Waiting">Waiting</option>
+                                  <option value="Activity requested">Activity requested</option>
+                                  <option value="Activity ending">Activity ending</option>
+                                  <option value="Item unavailable">Item unavailable</option>
+                                  <option value="Peer interaction">Peer interaction</option>
+                                  <option value="Loud noise">Loud noise</option>
+                                </select>
+                              </div>
+
+                              <div>
+                                <label className="text-grey-600 block mb-0.5 font-medium">B · Behavior</label>
+                                <select
+                                  value={draftBehaviorChoice}
+                                  onChange={(e) => setDraftBehaviorChoice(e.target.value)}
+                                  className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                                >
+                                  <option value="Refused or turned away">Refused or turned away</option>
+                                  <option value="Yelled or raised voice">Yelled or raised voice</option>
+                                  <option value="Hit, kicked or pushed">Hit, kicked or pushed</option>
+                                  <option value="Threw an item">Threw an item</option>
+                                  <option value="Left the area">Left the area</option>
+                                </select>
+                              </div>
+
+                              <div>
+                                <label className="text-grey-600 block mb-0.5 font-medium">C · Consequence</label>
+                                <select
+                                  value={draftConsequence}
+                                  onChange={(e) => setDraftConsequence(e.target.value)}
+                                  className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                                >
+                                  <option value="Staff redirected">Staff redirected</option>
+                                  <option value="Staff offered a break">Staff offered a break</option>
+                                  <option value="Activity paused">Activity paused</option>
+                                  <option value="Peer moved away">Peer moved away</option>
+                                  <option value="Activity continued">Activity continued</option>
+                                  <option value="No observed change">No observed change</option>
+                                </select>
+                              </div>
+
+                              {abcDuration && (
+                                <div>
+                                  <label className="text-grey-600 block mb-0.5 font-medium">Duration (minutes)</label>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    value={draftDurationMins}
+                                    onChange={(e) => setDraftDurationMins(e.target.value)}
+                                    className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none"
+                                  />
+                                </div>
+                              )}
+
+                              {abcLocation && (
+                                <div>
+                                  <label className="text-grey-600 block mb-0.5 font-medium">Location</label>
+                                  <select
+                                    value={draftLocation}
+                                    onChange={(e) => setDraftLocation(e.target.value)}
+                                    className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                                  >
+                                    <option value="Program site">Program site</option>
+                                    <option value="Community">Community</option>
+                                    <option value="Transit">Transit</option>
+                                  </select>
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              <div>
+                                <label className="text-grey-600 block mb-0.5 font-medium">Occurrence</label>
+                                <select
+                                  value={draftOccurrence}
+                                  onChange={(e) => setDraftOccurrence(e.target.value as 'Occurred' | 'No occurrence')}
+                                  className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                                >
+                                  <option value="Occurred">Occurred</option>
+                                  <option value="No occurrence">No occurrence</option>
+                                </select>
+                              </div>
+
+                              <div>
+                                <label className="text-grey-600 block mb-0.5 font-medium">Severity level</label>
+                                <select
+                                  value={draftSeverity}
+                                  onChange={(e) => setDraftSeverity(e.target.value)}
+                                  className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none cursor-pointer"
+                                >
+                                  <option value="1 · Mild">1 · Mild (Easy to redirect)</option>
+                                  <option value="2 · Moderate">2 · Moderate (Difficult to redirect)</option>
+                                  <option value="3 · Severe">3 · Severe (Safety assistance)</option>
+                                </select>
+                              </div>
+
+                              {customDuration && (
+                                <div>
+                                  <label className="text-grey-600 block mb-0.5 font-medium">Duration (minutes)</label>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    value={draftDurationMins}
+                                    onChange={(e) => setDraftDurationMins(e.target.value)}
+                                    className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-semibold text-grey-900 focus:outline-none"
+                                  />
+                                </div>
+                              )}
+
+                              <div>
+                                <label className="text-grey-600 block mb-0.5 font-medium">Explanation</label>
+                                <textarea
+                                  rows={2}
+                                  value={draftExplanation}
+                                  onChange={(e) => setDraftExplanation(e.target.value)}
+                                  className="w-full px-2 py-1 rounded-lg border border-grey-300 bg-white text-[10px] font-medium text-grey-900 focus:outline-none resize-none"
+                                />
+                              </div>
+                            </>
+                          )}
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newInc = {
+                              id: `inc-${Date.now()}`,
+                              time: draftTime,
+                              behavior: draftBehavior,
+                              a: behaviorMethod === 'abc' ? draftAntecedent : undefined,
+                              b: behaviorMethod === 'abc' ? draftBehaviorChoice : undefined,
+                              c: behaviorMethod === 'abc' ? draftConsequence : undefined,
+                              occ: behaviorMethod === 'custom' ? draftOccurrence : 'Occurred',
+                              sev: behaviorMethod === 'custom' ? draftSeverity : undefined,
+                              dur: (behaviorMethod === 'abc' && abcDuration) || (behaviorMethod === 'custom' && customDuration) ? `${draftDurationMins} mins` : undefined,
+                              loc: behaviorMethod === 'abc' && abcLocation ? draftLocation : undefined,
+                              notes: behaviorMethod === 'custom' ? draftExplanation : 'Redirected with positive response.',
+                            };
+                            setIncidentLog((prev) => [newInc, ...prev]);
+                            setIncidentFeedback('Incident saved in mobile preview!');
+                            setTimeout(() => setIncidentFeedback(null), 3000);
+                            Sound.tick();
+                          }}
+                          className="w-full py-2 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-bold text-[10px] shadow-xs transition-colors cursor-pointer"
+                        >
+                          Save incident
+                        </button>
+
+                        {incidentFeedback && (
+                          <div className="p-1.5 rounded-lg bg-emerald-50 text-[9px] text-emerald-800 font-bold text-center">
+                            ✓ {incidentFeedback}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Logged Incidents Mobile Cards */}
+                      <div className="space-y-2 pt-1">
+                        <div className="text-[10px] font-bold text-grey-500 uppercase tracking-wider">
+                          Logged Incidents ({incidentLog.length})
+                        </div>
+                        {incidentLog.slice(0, 3).map((row) => (
+                          <div key={row.id} className="p-2.5 rounded-xl border border-grey-200 bg-white space-y-1 shadow-2xs">
+                            <div className="flex items-center justify-between">
+                              <b className="text-[10px] font-bold text-grey-900">{row.behavior}</b>
+                              <span className="text-[8px] text-grey-500 font-medium">{row.time}</span>
+                            </div>
+                            {row.a && (
+                              <div className="text-[9px] text-grey-600 leading-snug">
+                                <span>A: {row.a}</span> · <span>B: {row.b}</span> · <span>C: {row.c}</span>
+                              </div>
+                            )}
+                            {row.sev && (
+                              <div className="text-[9px] text-grey-600">
+                                Severity: <b className="text-grey-900">{row.sev}</b>
+                              </div>
+                            )}
+                            {(row.dur || row.loc) && (
+                              <div className="text-[8px] text-grey-500 flex gap-2">
+                                {row.dur && <span>Duration: {row.dur}</span>}
+                                {row.loc && <span>Location: {row.loc}</span>}
+                              </div>
+                            )}
+                          </div>
+                        ))}
                       </div>
                     </div>
-                    <p className="text-xs text-grey-600 leading-relaxed">
-                      {behaviorMethod === 'abc'
-                        ? 'ABC tracking documents Antecedents (what triggered the behavior), Behaviors (the observable client action), and Consequences (the response or environmental shift).'
-                        : 'Custom severity levels (Mild, Moderate, Severe) categorize the intensity and safety impact of incidents observed during client activities.'}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="pt-8 text-xs text-emerald-800 italic text-right z-10 font-medium">
-                  Your choice carries into staff Daily Notes.
+                  </MobilePhoneMockup>
                 </div>
               </div>
             </>
@@ -4220,36 +4091,16 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                   </button>
                 </div>
 
-                {/* PHOTOREALISTIC IPHONE FRAME MOCKUP (Using public/iphone-frame.png) */}
-                <div className="relative w-[280px] sm:w-[305px] aspect-[583/1024] select-none mx-auto drop-shadow-xl mt-1">
-                  {/* Inside Screen Canvas underneath the bezel */}
-                  <div className="absolute left-[21.27%] top-[15.82%] w-[57.63%] h-[68.46%] rounded-[24px] sm:rounded-[26px] overflow-hidden bg-white text-grey-900 z-10 flex flex-col">
-                    <div className="w-full h-full overflow-y-auto px-3 pt-6 pb-4 space-y-3 text-left text-xs font-sans">
-                      {/* Phone Status Bar */}
-                      <div className="flex items-center justify-between text-[9px] font-bold text-grey-900 px-1 pt-0.5">
-                        <span>9:41</span>
-                        <div className="flex items-center gap-1 text-grey-700">
-                          <span className="text-[8px] font-bold">5G</span>
-                          <div className="w-3.5 h-2 rounded-xs border border-grey-800 flex items-center p-0.5">
-                            <div className="w-full h-full bg-grey-900 rounded-2xs" />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Daily note title */}
-                      <div className="pt-0.5 border-b border-grey-100 pb-1 flex items-center justify-between">
-                        <div>
-                          <div className="font-bold text-xs text-grey-900 leading-tight">Daily Note</div>
-                          <div className="text-[9px] text-grey-500">Joe Doe · October 5, 2026</div>
-                        </div>
-                        <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-grey-100 text-grey-600">
-                          Sec {activeNoteSection}/4
-                        </span>
-                      </div>
-
-                      {/* ====================================================
-                          SECTION 1: Client Information & Attendance
-                      ==================================================== */}
+                {/* 100% VISIBLE INTERACTIVE IPHONE MOCKUP */}
+                <MobilePhoneMockup
+                  title="Daily Note"
+                  subtitle="Joe Doe · October 5, 2026"
+                  badge={`Sec ${activeNoteSection}/4`}
+                >
+                  <div className="space-y-3 text-xs font-sans">
+                    {/* ====================================================
+                        SECTION 1: Client Information & Attendance
+                    ==================================================== */}
                       <div className={cn(
                         "p-2.5 rounded-2xl border transition-all space-y-2",
                         activeNoteSection === 1
@@ -4568,21 +4419,13 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
 
                         <button
                           type="button"
-                          className="w-full py-1.5 rounded-xl bg-[#0A0A0A] text-white font-bold text-[9px] shadow-xs"
+                          className="w-full py-2 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-bold text-[10px] shadow-xs transition-colors cursor-pointer"
                         >
                           Submit Daily Note
                         </button>
                       </div>
                     </div>
-                  </div>
-
-                  {/* REAL IPHONE FRAME OVERLAY (From user-uploaded media_1794072213988_59c1e525.png) */}
-                  <img
-                    src="/iphone-frame.png"
-                    alt="iPhone Frame"
-                    className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none z-20"
-                  />
-                </div>
+                </MobilePhoneMockup>
               </div>
             </div>
           </div>
