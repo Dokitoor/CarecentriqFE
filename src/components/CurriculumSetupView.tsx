@@ -4002,9 +4002,9 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                       Sound.tick();
                       toast.info(`Moved to Section ${activeNoteSection + 1}`);
                     } else {
+                      Sound.fanfare();
                       setCompletionCelebration(true);
-                      onObjectivesConfigured();
-                      toast.success('Curriculum Setup Completed!', `${program.name} is now ready for the ribbon cutting celebration!`);
+                      toast.success('Curriculum Ready!', `Time for the ribbon cutting ceremony for ${program.name}!`);
                     }
                   }}
                   className="px-6 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-neutral-800 text-white font-semibold text-xs transition-colors cursor-pointer flex items-center gap-2 shadow-xs"
@@ -4364,9 +4364,14 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
 
                         <button
                           type="button"
-                          className="w-full py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-bold text-[10px] shadow-xs transition-colors cursor-pointer"
+                          onClick={() => {
+                            Sound.fanfare();
+                            setCompletionCelebration(true);
+                            toast.success('Curriculum Ready!', `Time for the ribbon cutting ceremony for ${program.name}!`);
+                          }}
+                          className="w-full py-2.5 rounded-xl bg-[#0A0A0A] hover:bg-neutral-800 text-white font-bold text-[10px] shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                         >
-                          Submit Daily Note
+                          <span>Submit Daily Note & Cut Ribbon 🎉</span>
                         </button>
                       </div>
                     )}
@@ -4570,9 +4575,14 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
       ==================================================================== */}
       <FinaleCelebrationStage
         isOpen={completionCelebration}
-        onClose={() => setCompletionCelebration(false)}
+        onClose={() => {
+          setCompletionCelebration(false);
+          onObjectivesConfigured();
+          onReturnToDashboard();
+        }}
         onReturnToDashboard={() => {
           setCompletionCelebration(false);
+          onObjectivesConfigured();
           onReturnToDashboard();
         }}
         onWatchVideo={() => {
