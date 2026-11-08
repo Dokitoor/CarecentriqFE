@@ -471,6 +471,17 @@ export const CurriculumSetupView: React.FC<CurriculumSetupViewProps> = ({
   const [cociMinimized, setCociMinimized] = useState(false);
   const [completionCelebration, setCompletionCelebration] = useState(false);
 
+  // Auto-launch celebration if requested via URL param or hash (e.g. ?celebration=true or #ribbon)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const q = window.location.search.toLowerCase();
+      const h = window.location.hash.toLowerCase();
+      if (q.includes('celebration') || q.includes('ribbon') || h.includes('celebration') || h.includes('ribbon')) {
+        setCompletionCelebration(true);
+      }
+    }
+  }, []);
+
   // Behavior tracking state & Provider Setup (Page 1: Choice, Page 2: Setup)
   const [behaviorMethod, setBehaviorMethod] = useState<'abc' | 'custom'>('abc');
   const [behaviorPage, setBehaviorPage] = useState<'choice' | 'setup'>('choice');
@@ -831,6 +842,17 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                 </button>
               );
             })}
+            <button
+              type="button"
+              onClick={() => {
+                setCompletionCelebration(true);
+                Sound.fanfare();
+              }}
+              className="px-2.5 py-1 rounded-full flex items-center gap-1 text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs cursor-pointer transition-all ml-1 shrink-0"
+              title="Ribbon Cutting Ceremony"
+            >
+              <span>🎀 Ribbon Cutting</span>
+            </button>
           </div>
 
           {/* Step Counter */}
@@ -2943,6 +2965,17 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                 <span className="text-[11px] font-bold text-grey-600 uppercase tracking-wider ml-1">
                   Step 5 of 6
                 </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCompletionCelebration(true);
+                    Sound.fanfare();
+                  }}
+                  className="px-3 py-1 rounded-full flex items-center gap-1 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs cursor-pointer transition-all ml-1.5 shrink-0"
+                  title="Ribbon Cutting Ceremony"
+                >
+                  <span>🎀 Ribbon Cutting</span>
+                </button>
               </div>
             </div>
           </div>
@@ -3568,6 +3601,17 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                 <span className="text-[11px] font-bold text-grey-600 uppercase tracking-wider ml-1">
                   Step 6 of 6
                 </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCompletionCelebration(true);
+                    Sound.fanfare();
+                  }}
+                  className="px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm cursor-pointer transition-all ml-1.5 shrink-0"
+                  title="Ribbon Cutting Ceremony"
+                >
+                  <span>🎀 Ribbon Cutting</span>
+                </button>
               </div>
             </div>
           </div>
@@ -4015,20 +4059,33 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
 
               {/* Bottom Actions */}
               <div className="pt-8 border-t border-grey-100 flex items-center justify-between mt-8">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (activeNoteSection > 1) {
-                      setActiveNoteSection((s) => (s - 1) as 1 | 2 | 3 | 4);
-                      Sound.tick();
-                    } else {
-                      setStep('calendar');
-                    }
-                  }}
-                  className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-800 transition-colors cursor-pointer"
-                >
-                  Back
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (activeNoteSection > 1) {
+                        setActiveNoteSection((s) => (s - 1) as 1 | 2 | 3 | 4);
+                        Sound.tick();
+                      } else {
+                        setStep('calendar');
+                      }
+                    }}
+                    className="px-5 py-2.5 rounded-xl border border-grey-200 bg-white hover:bg-grey-50 text-xs font-semibold text-grey-800 transition-colors cursor-pointer"
+                  >
+                    Back
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCompletionCelebration(true);
+                      Sound.fanfare();
+                    }}
+                    className="px-4 py-2.5 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                  >
+                    <span>🎀 Cut the Ribbon Now</span>
+                  </button>
+                </div>
 
                 <button
                   type="button"
@@ -4668,7 +4725,7 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
             </p>
 
             {STEP_VIDEOS[step] && (
-              <div className="pt-1 flex items-center gap-2">
+              <div className="pt-1 flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={() => {
@@ -4679,6 +4736,17 @@ TSK-105,Manage Materials Properly,Safety,Uses safety scissors and tools appropri
                 >
                   <Play className="w-3 h-3 fill-current ml-0.5" />
                   <span>Watch lesson ({STEP_VIDEOS[step].duration})</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCompletionCelebration(true);
+                    Sound.fanfare();
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-100 hover:bg-emerald-200 text-emerald-800 transition-colors cursor-pointer border border-emerald-300 shadow-2xs"
+                >
+                  <span>🎀 Cut the ribbon</span>
                 </button>
               </div>
             )}

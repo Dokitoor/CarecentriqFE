@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Play } from 'lucide-react';
+import { ArrowRight, Play, X } from 'lucide-react';
 import { Sound } from '@/utils/soundEffects';
 
 interface FinaleCelebrationStageProps {
@@ -309,6 +309,16 @@ export const FinaleCelebrationStage: React.FC<FinaleCelebrationStageProps> = ({
 
   return (
     <div className={`fin ${isCut ? 'cut' : ''}`}>
+      {/* Top Right Close Button to Return to Setup */}
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-grey-800 flex items-center justify-center shadow-lg border border-black/10 cursor-pointer transition-transform hover:scale-105"
+        title="Close celebration and return to setup"
+      >
+        <X className="w-5 h-5" />
+      </button>
+
       {/* Background Rotating Sunburst Rays */}
       <div className="rays" />
 
@@ -431,20 +441,38 @@ export const FinaleCelebrationStage: React.FC<FinaleCelebrationStageProps> = ({
         {/* Posts & Ribbon */}
         <div className="post" style={{ left: '107px' }} />
         <div className="post" style={{ left: '1067px' }} />
-        <div className="ribbon l" />
-        <div className="ribbon r" />
+        <div
+          className="ribbon l cursor-pointer"
+          onClick={handleStartCut}
+          title="Click to cut the ribbon!"
+        />
+        <div
+          className="ribbon r cursor-pointer"
+          onClick={handleStartCut}
+          title="Click to cut the ribbon!"
+        />
 
         {/* Big Bow */}
-        <svg className="bow" viewBox="0 0 120 110" aria-hidden="true">
-          <path d="M60 40 C20 0 0 20 10 44 C18 64 46 56 60 46Z" fill="#E23B3F" stroke="#A81E22" strokeWidth="2" />
-          <path d="M60 40 C100 0 120 20 110 44 C102 64 74 56 60 46Z" fill="#E23B3F" stroke="#A81E22" strokeWidth="2" />
-          <path d="M54 48 L36 106 L48 100 L56 108 L60 52Z" fill="#C92A2E" />
-          <path d="M66 48 L84 106 L72 100 L64 108 L60 52Z" fill="#C92A2E" />
-          <circle cx="60" cy="44" r="12" fill="#F25A5E" stroke="#A81E22" strokeWidth="2" />
-        </svg>
+        <div
+          onClick={handleStartCut}
+          className="cursor-pointer"
+          title="Click to cut the ribbon!"
+        >
+          <svg className="bow" viewBox="0 0 120 110" aria-hidden="true">
+            <path d="M60 40 C20 0 0 20 10 44 C18 64 46 56 60 46Z" fill="#E23B3F" stroke="#A81E22" strokeWidth="2" />
+            <path d="M60 40 C100 0 120 20 110 44 C102 64 74 56 60 46Z" fill="#E23B3F" stroke="#A81E22" strokeWidth="2" />
+            <path d="M54 48 L36 106 L48 100 L56 108 L60 52Z" fill="#C92A2E" />
+            <path d="M66 48 L84 106 L72 100 L64 108 L60 52Z" fill="#C92A2E" />
+            <circle cx="60" cy="44" r="12" fill="#F25A5E" stroke="#A81E22" strokeWidth="2" />
+          </svg>
+        </div>
 
         {/* Coci Cutter with Shears */}
-        <div className="cutter">
+        <div
+          className="cutter cursor-pointer"
+          onClick={handleStartCut}
+          title="Click Coci to cut the ribbon!"
+        >
           <img
             src={isCut ? '/guided/coci_jump.webp' : '/guided/coci.webp'}
             alt="Coci"

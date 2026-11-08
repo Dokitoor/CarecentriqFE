@@ -94,3 +94,4 @@ export const MobilePhoneMockup: React.FC<MobilePhoneMockupProps> = ({
     </div>
   );
 };
+
