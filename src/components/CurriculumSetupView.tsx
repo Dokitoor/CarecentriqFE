@@ -471,17 +471,6 @@ export const CurriculumSetupView: React.FC<CurriculumSetupViewProps> = ({
   const [cociMinimized, setCociMinimized] = useState(false);
   const [completionCelebration, setCompletionCelebration] = useState(false);
 
-  // Auto-launch celebration if requested via URL param or hash (e.g. ?celebration=true or #ribbon)
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const q = window.location.search.toLowerCase();
-      const h = window.location.hash.toLowerCase();
-      if (q.includes('celebration') || q.includes('ribbon') || h.includes('celebration') || h.includes('ribbon')) {
-        setCompletionCelebration(true);
-      }
-    }
-  }, []);
-
   // Behavior tracking state & Provider Setup (Page 1: Choice, Page 2: Setup)
   const [behaviorMethod, setBehaviorMethod] = useState<'abc' | 'custom'>('abc');
   const [behaviorPage, setBehaviorPage] = useState<'choice' | 'setup'>('choice');

@@ -20,8 +20,6 @@ import { UnconfiguredProgramView } from './components/UnconfiguredProgramView';
 import { CurriculumSetupView, CurriculumStep } from './components/CurriculumSetupView';
 import { AuthFlow } from './components/AuthFlow';
 import { AnimatedMascotSvg } from './components/AnimatedMascotSvg';
-import { FinaleCelebrationStage } from './components/FinaleCelebrationStage';
-import { Sound } from './utils/soundEffects';
 
 import {
   ORGANIZATIONS,
@@ -53,7 +51,6 @@ export default function App() {
   const [setupProgram, setSetupProgram] = useState<Organization | null>(null);
   const [curriculumSetupScreen, setCurriculumSetupScreen] = useState<CurriculumStep | 'none'>('none');
   const [forceOperationsView, setForceOperationsView] = useState(false);
-  const [showCelebrationStage, setShowCelebrationStage] = useState(true);
 
   const [activeGroupKey, setActiveGroupKey] = useState<string>('home');
   const [activeItemId, setActiveItemId] = useState<string>('overview');
@@ -116,11 +113,9 @@ export default function App() {
     setCurrentOrg((prev) => ({ ...prev, isConfigured: true }));
     setCurriculumSetupScreen('none');
     setForceOperationsView(true);
-    setShowCelebrationStage(true);
-    Sound.fanfare();
     toast.success(
       'Curriculum Initialized',
-      `Objectives for "${currentOrg.name}" configured and ready for the ribbon cutting celebration!`
+      `Objectives for "${currentOrg.name}" successfully configured!`
     );
   };
 
@@ -218,10 +213,6 @@ export default function App() {
           onSignOut={handleSignOut}
           selectedClientName={selectedClient?.name}
           onClearClient={() => setSelectedClient(null)}
-          onOpenCelebration={() => {
-            setShowCelebrationStage(true);
-            Sound.fanfare();
-          }}
         />
 
         {/* Scrollable Workstation Canvas */}
@@ -249,10 +240,6 @@ export default function App() {
                     staff={staff}
                     onNavigate={handleSelectItem}
                     onSelectClient={setSelectedClient}
-                    onOpenCelebration={() => {
-                      setShowCelebrationStage(true);
-                      Sound.fanfare();
-                    }}
                   />
                 )
               )}
@@ -407,23 +394,6 @@ export default function App() {
           Need help?
         </span>
       </button>
-
-      {/* Grand Finale Celebration Stage (Interactive Ribbon Cutting) */}
-      <FinaleCelebrationStage
-        isOpen={showCelebrationStage}
-        onClose={() => setShowCelebrationStage(false)}
-        onReturnToDashboard={() => setShowCelebrationStage(false)}
-        onWatchVideo={() => {
-          Sound.fanfare();
-        }}
-        programName={currentOrg.name}
-        programCategory={(currentOrg as any).category || 'Day Services'}
-        scheduleType="Regular program schedule"
-        isBehavioral={true}
-        objectivesCount={2}
-        trainingsCount={2}
-        tasksCount={3}
-      />
     </div>
   );
 }

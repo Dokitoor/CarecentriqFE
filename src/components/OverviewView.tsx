@@ -21,7 +21,6 @@ interface OverviewViewProps {
   staff: StaffRecord[];
   onNavigate: (viewId: string) => void;
   onSelectClient: (client: ClientRecord) => void;
-  onOpenCelebration?: () => void;
 }
 
 export const OverviewView: React.FC<OverviewViewProps> = ({
@@ -30,7 +29,6 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   staff,
   onNavigate,
   onSelectClient,
-  onOpenCelebration,
 }) => {
   const activeStaff = staff.filter((s) => s.status === 'Active');
   const activeClients = clients.filter((c) => c.status === 'Active');
@@ -67,18 +65,6 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           </div>
 
           <div className="flex flex-wrap lg:flex-col gap-2.5 shrink-0">
-            {onOpenCelebration && (
-              <button
-                type="button"
-                onClick={() => {
-                  onOpenCelebration();
-                  Sound.fanfare();
-                }}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xs transition-all shadow-md active:scale-95 cursor-pointer animate-pulse"
-              >
-                <span>🎀 Ribbon Cutting Ceremony</span>
-              </button>
-            )}
             <button
               onClick={() => {
                 toast.info('Shift Note Composer', `Preparing progress note roster for ${currentOrg.name}.`);

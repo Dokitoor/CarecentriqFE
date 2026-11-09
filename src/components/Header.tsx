@@ -38,7 +38,6 @@ interface HeaderProps {
   clientCount?: number;
   selectedClientName?: string | null;
   onClearClient?: () => void;
-  onOpenCelebration?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -58,7 +57,6 @@ export const Header: React.FC<HeaderProps> = ({
   onSignOut,
   selectedClientName,
   onClearClient,
-  onOpenCelebration,
 }) => {
   const [showOrgDropdown, setShowOrgDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -179,21 +177,6 @@ export const Header: React.FC<HeaderProps> = ({
             </>
           )}
         </div>
-
-        {/* Ribbon Cutting Ceremony Button if Configured */}
-        {onOpenCelebration && currentOrg.isConfigured && (
-          <button
-            type="button"
-            onClick={() => {
-              onOpenCelebration();
-              Sound.fanfare();
-            }}
-            className="px-3 py-1.5 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all hover:scale-105 active:scale-95"
-            title="Ribbon Cutting Ceremony"
-          >
-            <span>🎀 Ribbon Cutting</span>
-          </button>
-        )}
 
         {/* Notifications Popover */}
         <div className="relative">
